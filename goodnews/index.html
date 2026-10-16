@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Good News - Salvation</title>
+    <style>
+        :root {
+            --page-bg: #f5f2ec;
+            --page-bg-strong: #e8e0d5;
+            --surface: #ffffff;
+            --surface-soft: #f0ece7;
+            --border-color: #d8d0c5;
+            --gold-primary: #8b6a1f;
+            --gold-soft: #b9933b;
+            --gold-deep: #2f250f;
+            --text-main: #1d1a17;
+            --text-muted: #5a524d;
+            --focus-ring: #1d4ed8;
+            --shadow-soft: rgba(39, 28, 11, 0.08);
+            --system-serif: "Times New Roman", Times, "Noto Serif", serif;
+            --system-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background: var(--page-bg);
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--page-bg) 0%, #faf8f5 100%);
+            color: var(--text-main);
+            font-family: var(--system-sans);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: clamp(0.75rem, 2vw, 1.5rem);
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            padding: 1rem 0 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: clamp(1.25rem, 4vw, 2rem);
+        }
+
+        .cross-icon {
+            color: var(--gold-primary);
+            font-size: 1.6rem;
+            line-height: 1;
+            margin-bottom: 0.55rem;
+            display: inline-block;
+        }
+
+        .site-title {
+            font-family: var(--system-serif);
+            font-size: 0.9rem;
+            letter-spacing: 0.26em;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .lang-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .lang-nav label {
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            min-height: 44px;
+            padding: 0.7rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lang-nav label:hover {
+            border-color: var(--gold-soft);
+            background-color: var(--surface-soft);
+        }
+
+        .lang-nav label:active {
+            transform: translateY(1px);
+        }
+
+        input[type="radio"].lang-toggle {
+            display: none;
+        }
+
+        #lang-en:checked ~ header .lang-nav label[for="lang-en"],
+        #lang-es:checked ~ header .lang-nav label[for="lang-es"],
+        #lang-fa:checked ~ header .lang-nav label[for="lang-fa"],
+        #lang-ar:checked ~ header .lang-nav label[for="lang-ar"],
+        #lang-zh:checked ~ header .lang-nav label[for="lang-zh"],
+        #lang-ko:checked ~ header .lang-nav label[for="lang-ko"],
+        #lang-th:checked ~ header .lang-nav label[for="lang-th"],
+        #lang-lo:checked ~ header .lang-nav label[for="lang-lo"] {
+            border-color: var(--gold-primary);
+            color: #fff;
+            background-color: var(--gold-deep);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        }
+
+        .lang-content {
+            display: none;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        #lang-en:checked ~ main #content-en,
+        #lang-es:checked ~ main #content-es,
+        #lang-fa:checked ~ main #content-fa,
+        #lang-ar:checked ~ main #content-ar,
+        #lang-zh:checked ~ main #content-zh,
+        #lang-ko:checked ~ main #content-ko,
+        #lang-th:checked ~ main #content-th,
+        #lang-lo:checked ~ main #content-lo {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.65; }
+            to { opacity: 1; }
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--surface-soft);
+            border: 1px solid var(--gold-soft);
+            color: var(--gold-primary);
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: var(--system-serif);
+            color: var(--gold-primary);
+            font-size: clamp(2.2rem, 5vw, 3rem);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.08em;
+            line-height: 1.2;
+        }
+
+        .prose p {
+            margin-bottom: 1.3rem;
+            font-size: clamp(1rem, 2vw, 1.08rem);
+            color: var(--text-main);
+            text-align: left;
+            max-width: 68ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .prose p.highlight {
+            color: var(--gold-primary);
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 2.5rem 0;
+        }
+
+        h2 {
+            font-family: var(--system-serif);
+            color: var(--gold-primary);
+            font-size: clamp(1.3rem, 3vw, 1.7rem);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.06em;
+            line-height: 1.3;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 600px) {
+            .steps-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .step-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.2rem;
+            box-shadow: 0 8px 20px var(--shadow-soft);
+        }
+
+        .step-num {
+            color: var(--gold-primary);
+            font-family: var(--system-serif);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .step-desc {
+            font-size: 0.94rem;
+            color: var(--text-muted);
+        }
+
+        .summary-box {
+            background-color: var(--surface-soft);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--gold-primary);
+            border-radius: 14px;
+            padding: 1.2rem 1.1rem;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 16px rgba(28, 22, 15, 0.03);
+        }
+
+        .download-box {
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.3rem 1rem;
+            text-align: center;
+            margin-top: 1rem;
+            box-shadow: 0 8px 20px var(--shadow-soft);
+        }
+
+        .download-box h3 {
+            font-family: var(--system-serif);
+            color: var(--gold-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            background-color: var(--gold-primary);
+            color: #ffffff;
+            border: 1px solid var(--gold-primary);
+            padding: 0.75rem 1.2rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: filter 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 8px 18px rgba(139, 106, 31, 0.18);
+        }
+
+        .download-btn:hover {
+            filter: brightness(1.04);
+        }
+
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+
+        a:focus-visible,
+        label:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 3px;
+        }
+
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .rtl .prose p {
+            text-align: right;
+        }
+
+        .rtl .summary-box {
+            border-left: 1px solid var(--border-color);
+            border-right: 4px solid var(--gold-primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .lang-nav {
+                gap: 0.4rem;
+            }
+
+            .lang-nav label {
+                flex: 1 1 calc(50% - 0.5rem);
+                min-width: 120px;
+            }
+
+            .summary-box,
+            .step-card,
+            .download-box {
+                border-radius: 12px;
+            }
+
+            .download-btn {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hidden CSS Radio Inputs for Language Switching -->
+    <input type="radio" name="lang" id="lang-en" class="lang-toggle" checked>
+    <input type="radio" name="lang" id="lang-es" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-fa" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-ar" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-zh" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-ko" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-th" class="lang-toggle">
+    <input type="radio" name="lang" id="lang-lo" class="lang-toggle">
+
+    <header>
+        <div class="container">
+            <div class="cross-icon">&#10013;</div>
+            <div class="site-title">GRACE</div>
+
+            <!-- CSS-only Tabs -->
+            <nav class="lang-nav" aria-label="Language selector">
+                <label for="lang-en">English</label>
+                <label for="lang-es">Español</label>
+                <label for="lang-fa">فارسی</label>
+                <label for="lang-ar">العربية</label>
+                <label for="lang-zh">中文</label>
+                <label for="lang-ko">한국어</label>
+                <label for="lang-th">ไทย</label>
+                <label for="lang-lo">ພາສາລາວ</label>
+            </nav>
+        </div>
+    </header>
+
+    
+    <main class="container" aria-live="polite">
+        <!-- English Section -->
+        <article id="content-en" class="lang-content" lang="en">
+            <div style="text-align: center;"><span class="badge">The Gift of Salvation</span></div>
+            <h1>GOOD NEWS</h1>
+            <div class="prose">
+                <p>You were made for a relationship with God, but sin broke that connection. Not just the big failures, but the quiet ways we fall short of love, of truth, of who we were meant to be. Left on our own, we can't fix that gap. No amount of good behavior closes it.</p>
+                <p>So God closed it himself. Jesus, fully God and fully human, lived the life we couldn't live, then died the death we deserved, taking our sin upon himself. Three days later, he rose from the grave, breaking death's hold for good.</p>
+                <p class="highlight">This is grace: not earned, not deserved, just given. Salvation isn't a reward for good people. It's a gift for anyone willing to receive it.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>TO BE SAVED IS SIMPLE</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">Believe</div>
+                    <div class="step-desc">Trust that Jesus is who he said he is, and that his death and resurrection are enough to save you.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">Turn</div>
+                    <div class="step-desc">Turn away from trying to save yourself, and turn toward him.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">Receive</div>
+                    <div class="step-desc">Accept the gift. Ask him to forgive you and make you new.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                That's it. Not a burdensome checklist, not years of effort. Just faith, offered freely and received freely. For next steps: read the Bible daily, find a good local church, and continue to grow your faith.
+            </div>
+
+            <div class="download-box">
+                <h3>DOWNLOAD A BIBLE</h3>
+                <a href="en.pdf" download class="download-btn">&#128214; Download Holy Bible (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Spanish Section -->
+        <article id="content-es" class="lang-content" lang="es">
+            <div style="text-align: center;"><span class="badge">El Regalo de la Salvación</span></div>
+            <h1>BUENAS NUEVAS</h1>
+            <div class="prose">
+                <p>Fuiste creado para tener una relación con Dios, pero el pecado rompió esa conexión. No solo los grandes fallos, sino las formas silenciosas en que no alcanzamos el amor, la verdad y lo que debíamos ser. Por nuestra cuenta, no podemos reparar ese abismo. Ninguna cantidad de buenas acciones puede cerrarlo.</p>
+                <p>Así que Dios mismo lo cerró. Jesús, verdaderamente Dios y verdaderamente hombre, vivió la vida que no pudimos vivir y luego murió la muerte que merecíamos, tomando nuestro pecado sobre sí mismo. Tres días después, resucitó de la tumba, rompiendo el dominio de la muerte para siempre.</p>
+                <p class="highlight">Esto es la gracia: no se gana, no se merece, simplemente se da. La salvación no es un premio para la gente buena. Es un regalo para cualquiera que esté dispuesto a recibirlo.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>SER SALVO ES SENCILLO</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">Cree</div>
+                    <div class="step-desc">Confía en que Jesús es quien dijo ser, y que su muerte y resurrección son suficientes para salvarte.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">Vuélvete</div>
+                    <div class="step-desc">Deja de intentar salvarte a ti mismo y vuélvete hacia Él.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">Recibe</div>
+                    <div class="step-desc">Acepta el regalo. Pídele que te perdone y te haga nuevo.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                Eso es todo. No es una lista de verificación pesada, ni años de esfuerzo. Solo fe, ofrecida gratuitamente y recibida gratuitamente. Para el siguiente paso: lee la Biblia cada día, encuentra una buena iglesia local y sigue creciendo en tu fe.
+            </div>
+
+            <div class="download-box">
+                <h3>DESCARGAR LA BIBLIA</h3>
+                <a href="sp.pdf" download class="download-btn">&#128214; Descargar Santa Biblia (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Farsi Section -->
+        <article id="content-fa" class="lang-content rtl" lang="fa" dir="rtl">
+            <div style="text-align: center;"><span class="badge">هدیه نجات</span></div>
+            <h1>خبر خوش</h1>
+            <div class="prose">
+                <p>شما برای داشتن رابطه با خدا آفریده شده‌اید، اما گناه این پیوند را گسست. نه تنها لغزش‌های بزرگ، بلکه همان راه‌های آرامی که از محبت، حقیقت و آن کسی که قرار بود باشیم، کوتاه آمدیم. ما به تنهایی نمی‌توانیم این شکاف را ترمیم کنیم. هیچ مقدار از رفتار خوب نیز نمی‌‌تواند آن را پر کند.</p>
+                <p>پس خود خدا این شکاف را پر کرد. عیسی، که کاملاً خدا و کاملاً انسان بود، زیستی داشت که ما نتوانستیم داشته باشیم و سپس مرگی را که ما سزاوارش بودیم پذیرفت و گناه ما را بر خود گرفت. سه روز بعد، او از قبر برخاست و قدرت مرگ را برای همیشه شکست.</p>
+                <p class="highlight">این است فیض: نه به دست آمده، نه سزاوار آن بوده‌ایم، بلکه فقط بخشیده شده است. نجات پاداشی برای افراد خوب نیست؛ هدیه‌ای است برای هر کسی که خواهان دریافت آن باشد.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>نجات یافتن ساده است</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">۰۱</div>
+                    <div class="step-title">ایمان بیاورید</div>
+                    <div class="step-desc">اعتماد کنید که عیسی همان کسی است که گفت، و مرگ و رستاخیز او برای نجات شما کافی است.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">۰۲</div>
+                    <div class="step-title">بازگردید</div>
+                    <div class="step-desc">از تلاش برای نجات دادن خود دست بردارید و به سوی او بازگردید.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">۰۳</div>
+                    <div class="step-title">دریافت کنید</div>
+                    <div class="step-desc">این هدیه را بپذیرید. از او بخواهید شما را ببخشد و تازه سازد.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                همین و بس. نه یک فهرست چک‌لیست سنگین و طاقت‌فرسا، نه سال‌ها تلاش. فقط ایمانی که به رایگان بخشیده شده و به رایگان دریافت می‌شود. برای گام‌های بعدی: هر روز کتاب مقدس را بخوانید، یک کلیسای خوب محلی پیدا کنید، و به رشد ایمان خود ادامه دهید.
+            </div>
+
+            <div class="download-box">
+                <h3>دانلود کتاب مقدس</h3>
+                <a href="fa.pdf" download class="download-btn">&#128214; دانلود کتاب مقدس (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Arabic Section -->
+        <article id="content-ar" class="lang-content rtl" lang="ar" dir="rtl">
+            <div style="text-align: center;"><span class="badge">عطية الخلاص</span></div>
+            <h1>الأخبار السارة</h1>
+            <div class="prose">
+                <p>لقد خُلقت من أجل علاقة مع الله، لكن الخطية كسرت هذا التواصل. ليس فقط بالإخفاقات الكبيرة، بل بتلك الطرق الخفية التي نقصر فيها عن المحبة والحق وعن الصورة التي أُردنا أن نكون عليها. بمفردنا، لا يمكننا إصلاح هذه الفجوة، ولا يمكن لأي قدر من الأعمال الصالحة أن يردمها.</p>
+                <p>لذلك ردمها الله بنفسه. يسوع، الإله الكامل والإنسان الكامل، عاش الحياة التي لم نستطع أن نعيشها، ثم مات الموت الذي نستحقه، حاملاً خطايانا في جسده. وبعد ثلاثة أيام، قام من القبر، كاسراً شوكة الموت إلى الأبد.</p>
+                <p class="highlight">هذه هي النعمة: لا تُكتسب، ولا نُستحقها، بل تُوهب مجاناً. الخلاص ليس مكافأة للصالحين، بل هو هدیة لكل من يرغب في قبولها.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>الخلاص بسيط جداً</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">٠١</div>
+                    <div class="step-title">آمن</div>
+                    <div class="step-desc">ثق بأن يسوع هو من قال عن نفسه، وأن موته وقِيامته كافيان لخلاصك.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">٠٢</div>
+                    <div class="step-title">ارجع</div>
+                    <div class="step-desc">توقف عن محاولة خلاص نفسك، وارجع بكليتك إليه.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">٠٣</div>
+                    <div class="step-title">اقبل</div>
+                    <div class="step-desc">اقبل هذه العطية. اطلب منه أن يغفر لك ويجدد حياتك.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                هذا كل شيء. ليس قائمة من المهام الشاقة، ولا سنوات من الجهد. إنه مجرد إيمان يُعطى مجاناً ويُقبل مجاناً. ولخطواتك القادمة: اقرأ الكتاب المقدس يومياً، وابحث عن كنيسة محلية جيدة، وواصل نمو إيمانك.
+            </div>
+
+            <div class="download-box">
+                <h3>تحميل الكتاب المقدس</h3>
+                <a href="ar.pdf" download class="download-btn">&#128214; تحميل الكتاب المقدس (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Mandarin Section -->
+        <article id="content-zh" class="lang-content" lang="zh-Hans">
+            <div style="text-align: center;"><span class="badge">救恩的礼物</span></div>
+            <h1>福音</h1>
+            <div class="prose">
+                <p>你受造是为了与神建立亲密的关系，但罪破坏了这份连结。不仅是那些显而易见的过错，更是我们在爱、真理以及受造本意上的亏欠。凭我们自己的力量，无法弥补这个鸿沟，再多的善行也无法填补它。</p>
+                <p>因此，神亲自弥补了这个鸿沟。耶稣，既是完全的神，也是完全的人，活出了我们无法活出的完美生命，随后替我们承担了应得的死亡，将我们的罪担在他自己身上。三天后，他从死里复活，永远打破了死亡的权势。</p>
+                <p class="highlight">这就是恩典：不是赚取的，不是配得的，而是白白赐予的。救恩不是给好人的奖赏，而是给任何愿意接受之人的礼物。</p>
+            </div>
+            <div class="divider"></div>
+            <h2>得救其实很简单</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">信靠</div>
+                    <div class="step-desc">相信耶稣正如他所宣示的那样，并坚信他的死与复活足以拯救你。</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">悔转</div>
+                    <div class="step-desc">放下想要拯救自己的努力，转而面向他。</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">接受</div>
+                    <div class="step-desc">接受这份礼物。求他赦免你，使你获得新生。</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                就是这么简单。不是沉重的清单，也不是多年的努力。只需凭着信心，白白地接受这份白白赐予的恩典。接下来的步骤：每天读圣经，寻找一间合适的当地教会，并继续成长你的信心。
+            </div>
+
+            <div class="download-box">
+                <h3>下载圣经</h3>
+                <a href="cn.pdf" download class="download-btn">&#128214; 下载中文圣经 (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Korean Section -->
+        <article id="content-ko" class="lang-content" lang="ko">
+            <div style="text-align: center;"><span class="badge">구원의 선물</span></div>
+            <h1>복음</h1>
+            <div class="prose">
+                <p>당신은 하나님과 친밀한 관계를 맺도록 창조되었으나, 죄로 인해 그 관계가 깨어졌습니다. 커다란 잘못뿐만 아니라 사랑과 진리, 그리고 원래의 모습에 미치지 못한 모든 순간들이 그렇습니다. 우리 힘으로는 이 격차를 메울 수 없으며, 그 어떤 선행으로도 그것을 채울 수 없습니다.</p>
+                <p>그래서 하나님께서 직접 그 격차를 줄이셨습니다. 완전한 하나님이자 완전한 인간이신 예수님은 우리가 살 수 없었던 완벽한 삶을 사셨고, 우리가 받아야 할 죽음을 대신 맞이하시며 우리의 죄를 짊어지셨습니다. 그리고 사흘 만에 무덤에서 부활하셔서 죽음의 권세를 영원히 깨뜨리셨습니다.</p>
+                <p class="highlight">이것이 바로 은혜입니다. 노력으로 얻는 것도, 자격이 있어서 받는 것도 아닌, 그저 주어지는 선물입니다. 구원은 착한 사람에게 주는 상급이 아니라, 받기를 원하는 모든 이에게 주시는 하나님의 선물입니다.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>구원은 단순합니다</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">믿으십시오</div>
+                    <div class="step-desc">예수님이 말씀하신 그분이심을 믿고, 그분의 죽으심과 부활이 당신을 구원하기에 충분함을 신뢰하십시오.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">돌아서하십시오</div>
+                    <div class="step-desc">스스로를 구원하려는 노력을 내려놓고, 그분을 향해 돌아서십시오.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">받으십시오</div>
+                    <div class="step-desc">이 선물을 받아들이십시오. 당신을 용서하시고 새롭게 해주시기를 기도하십시오.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                이것이 전부입니다. 부담스러운 체크리스트나 수년간의 노력이 아닙니다. 오직 믿음으로, 거저 주시는 은혜를 거저 받는 것입니다. 다음 단계: 매일 성경을 읽고, 좋은 지역 교회를 찾으며, 믿음을 계속 성장시키십시오.
+            </div>
+
+            <div class="download-box">
+                <h3>성경 다운로드</h3>
+                <a href="kr.pdf" download class="download-btn">&#128214; 성경 다운로드 (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Thai Section -->
+        <article id="content-th" class="lang-content" lang="th">
+            <div style="text-align: center;"><span class="badge">ของขวัญแห่งความรอด</span></div>
+            <h1>ข่าวดี</h1>
+            <div class="prose">
+                <p>คุณถูกสร้างมาเพื่อให้มีความสัมพันธ์กับพระเจ้า แต่ความบาปได้ทำลายความเชื่อมโยงนั้น ไม่ใช่แค่ความผิดพลาดใหญ่หลวงเท่านั้น แต่รวมถึงความบกพร่องในความรัก ความจริง และตัวตนที่เราควรจะเป็น ด้วยตัวเราเอง เราไม่สามารถประสานช่องว่างนั้นได้ ไม่มีการทำดีมากแค่ไหนที่จะปิดช่องว่างนั้นได้</p>
+                <p>พระเจ้าจึงทรงปิดช่องว่างนั้นด้วยพระองค์เอง พระเยซูทรงเป็นพระเจ้าแท้และมนุษย์แท้ ทรงดำเนินชีวิตในแบบที่เราไม่สามารถทำได้ และทรงยอมสิ้นพระชนม์แทนเรา รับเอาความบาปของเราไว้ที่พระองค์เอง สามวันหลังจากนั้น พระองค์ทรงฟื้นคืนพระชนม์จากความตาย ทำลายอำนาจแห่งความตายอย่างสิ้นเชิง</p>
+                <p class="highlight">นี่คือพระคุณ ไม่ใช่สิ่งที่เราไขว่คว้ามา ไม่ใช่สิ่งที่เราคู่ควร แต่เป็นสิ่งที่มอบให้ด้วยความรัก ความรอดไม่ใช่รางวัลสำหรับคนดี แต่เป็นของขวัญสำหรับทุกคนที่เต็มใจรับไว้</p>
+            </div>
+            <div class="divider"></div>
+            <h2>การได้รับความรอดนั้นเรียบง่าย</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">เชื่อ</div>
+                    <div class="step-desc">วางใจว่าพระเยซูทรงเป็นอย่างที่พระองค์ตรัสไว้ และการสิ้นพระชนม์และการฟื้นคืนพระชนม์ของพระองค์เพียงพอที่จะช่วยคุณให้รอด</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">หันกลับ</div>
+                    <div class="step-desc">หันหลังจากการพยายามพึ่งพาตัวเองในการพยายามช่วยตัวเองให้รอด และหันไปหาพระองค์</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">รับเอา</div>
+                    <div class="step-desc">ยอมรับของขวัญชิ้นนี้ ขอพระองค์ทรงให้อภัยและสร้างคุณใหม่</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                เพียงเท่านี้เอง ไม่ใช่รายการสิ่งที่ต้องทำอันหนักหน่วง ไม่ใช่ความพยายามหลายปี เพียงแค่ความเชื่อ ที่มอบให้เปล่าๆ และรับไว้ด้วยความเต็มใจ สำหรับขั้นตอนต่อไป: อ่านพระคัมภีร์ทุกวัน ค้นหาโบสถ์ท้องถิ่นที่ดี และก้าวต่อไปเพื่อเติบโตในความเชื่อของคุณ
+            </div>
+
+            <div class="download-box">
+                <h3>ดาวน์โหลดพระคัมภีร์</h3>
+                <a href="th.pdf" download class="download-btn">&#128214; ดาวน์โหลดพระคัมภีร์ (PDF)</a>
+            </div>
+        </article>
+
+        <!-- Lao Section -->
+        <article id="content-lo" class="lang-content" lang="lo">
+            <div style="text-align: center;"><span class="badge">ຂອງຂວັນแห่งความรอด</span></div>
+            <h1>ຂ່າວດີ</h1>
+            <div class="prose">
+                <p>ທ່ານຖືກສ້າງມາເພື່ອມີສາຍສໍາພັນກັບພຣະເຈົ້າ, ແຕ່ຄວາມບາບໄດ້ທໍາລາຍຄວາມພັນທະນັ້ນ. ບໍ່ແມ່ນແຕ່ຄວາມຜິດພາດໃຫຍ່ຫຼວງ, ແຕ່ລວມເຖິງວິທີທີ່ສຸພາບທີ່ເຮົາຫຼຸດພົ້ນຈາກຄວາມຮັກ, ຄວາມຈິງ, ແລະສິ່ງທີ່ເຮົາຄວນจะเป็น. ດ້ວຍຕົວເຮົາເອງ, ເຮົາບໍ່ສາມາດແກ້ໄຂຊ່ອງຫວ່າງນັ້ນໄດ້. ບໍ່ມີຄວາມດີຫຼາຍປານໃດທີ່ຈະປິດມັນໄດ້.</p>
+                <p>ດັ່ງນັ້ນ, ພຣະເຈົ້າຈຶ່ງໄດ້ປິດຊ່ອງຫວ່າງນັ້ນດ້ວຍພຣະອົງເອງ. ພຣະເຢຊູ, ຜູ້ເປັນພຣະເຈົ້າຢ່າງສົມບູນ ແລະ ເປັນມະນຸດຢ່າງສົມບູນ, ໄດ້ດໍາເນີນຊີວິດທີ່ເຮົາບໍ່ສາມາດດໍາເນີນໄດ້, ແລ້ວໄດ້สิ้นພຣະຊົນແທນຄວາມຕາຍທີ່ເຮົາສົມຄວນໄດ້ຮັບ, ໂດຍຮັບເອົາຄວາມບາບຂອງເຮົາໄວ້ທີ່ພຣະອົງເອງ. ສາມມື້ຕໍ່ມາ, ພຣະອົງໄດ້ຟື້ນຄືນພຣະຊົນຈາກອຸມົງ, ທໍາລາຍອໍານາດຂອງຄວາມຕາຍຢ່າງสิ้นเชิง.</p>
+                <p class="highlight">ນີ້คือພຣະຄຸນ: ບໍ່ໄດ້ມາຈາກການກະທໍາ, ບໍ່ໄດ້ສົມຄວນໄດ້ຮັບ, ແຕ່ຖືກປະທານໃຫ້. ຄວາມຮອດບໍ່ແມ່ນລາງວັນສໍາລັບຄົນດີ. ມັນແມ່ນຂອງຂວັນສໍາລັບທຸກຄົນທີ່ເຕັມໃຈຮັບເອົາ.</p>
+            </div>
+            <div class="divider"></div>
+            <h2>ການໄດ້ຮັບຄວາມຮອດແມ່ນງ່າຍດາຍ</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-title">ເຊື່ອ</div>
+                    <div class="step-desc">ວາງໃຈວ່າ ພຣະເຢຊູ ທຣົງເປັນຜູ້ທີ່ພຣະອົງໄດ້ກ່າວໄວ້, ແລະ ການสิ้นພຣະຊົນ ແລະ ການຟື້ນຄືນພຣະຊົນຂອງພຣະອົງ ພຽງພໍທີ່ຈະຊ່ວຍທ່ານໃຫ້ຮອດ.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-title">ຫັນກັບ</div>
+                    <div class="step-desc">ຫັນຫຼັງຈາກການພະຍາຍາມຊ່ວຍຕົວເອງໃຫ້ຮອດ, ແລະ ຫັນໄປຫາພຣະອົງ.</div>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-title">ຮັບເອົາ</div>
+                    <div class="step-desc">ຍອມຮັບຂອງຂວັນ. ຂໍໃຫ້ພຣະອົງອະໄພໂທດ ແລະ ສ້າງທ່ານໃຫມ່.</div>
+                </div>
+            </div>
+            <div class="summary-box">
+                ພຽງເທົ່ານີ້. ບໍ່ແມ່ນລາຍການກວດເຊັກທີ່ເປັນພາລະ, ບໍ່ແມ່ນຄວາມພະຍາຍາມຫຼາຍປີ. ພຽງແຕ່ຄວາມເຊື່ອ, ທີ່ມອບໃຫ້ໂດຍບໍ່ມີຄ່າ ແລະ ຮັບເອົາໂດຍບໍ່ມີຄ່າ. ສໍາລັບຂັ້ນຕອນຕໍ່ໄປ: ອ່ານພຣະຄໍາພີປະຈໍາວັນ, ຊອກຫາວັດທີ່ດີຂອງທ້ອງຖິ່ນ, ແລະ ສືບຕໍ່ຈະເຕີບໂຕໃນຄວາມເຊື່ອຂອງທ່ານ.
+            </div>
+
+            <div class="download-box">
+                <h3>ດາວໂຫລດ ພຣະຄໍາພີ</h3>
+                <a href="la.pdf" download class="download-btn">&#128214; ດາວໂຫລດ ພຣະຄໍາພີ (PDF)</a>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="container">
+            Also available via TOR at x3aguauayohj26fmerfoapxaw5xso2fv54cti4n5t7ydcgdzhakeqbad.onion/goodnews
+        </div>
+    </footer>
+
+</body>
+</html>
