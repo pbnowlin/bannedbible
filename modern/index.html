@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banned Bible</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>bannedbible.com</h1>
+            <div class="header-actions">
+                <!-- Search Icon Button -->
+                <button id="search-toggle-btn" aria-label="Open Search" title="Search Bible">🔍</button>
+                <!-- Dark Mode Toggle Button -->
+                <button id="dark-mode-toggle" aria-label="Toggle dark mode" title="Toggle Theme">🌙</button>
+                <button id="scripture-size-decrease" class="scripture-size-button" type="button" aria-label="Decrease scripture text size" title="Decrease scripture text size">−</button>
+                <button id="scripture-size-increase" class="scripture-size-button" type="button" aria-label="Increase scripture text size" title="Increase scripture text size">+</button>
+            </div>
+        </header>
+
+        <!-- Search Modal / Overlay -->
+        <div id="search-modal" class="search-modal hidden" aria-hidden="true">
+            <div class="search-modal-content">
+                <div class="search-header">
+                    <h2>Search Bible</h2>
+                    <button id="search-close-btn" aria-label="Close Search">&times;</button>
+                </div>
+                <div class="search-input-group">
+                    <input type="text" id="search-input" placeholder="Type keyword or phrase (e.g., love, peace)..." autocomplete="off">
+                    <button id="search-submit-btn">Search</button>
+                </div>
+                <div id="search-results-container">
+                    <p class="search-placeholder">Type a word or phrase to search across all books and chapters.</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="controls">
+            <div class="control-group">
+                <label for="book-select">Book:</label>
+                <select id="book-select">
+                    <option value="">Select Book</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="chapter-select">Chapter:</label>
+                <select id="chapter-select" disabled>
+                    <option value="">Select Chapter</option>
+                </select>
+            </div>
+        </nav>
+
+        <!-- Top Navigation Buttons -->
+        <div class="navigation-buttons top-nav">
+            <button class="prev-btn" disabled>&laquo; Previous</button>
+            <button class="next-btn" disabled>Next &raquo;</button>
+        </div>
+
+        <main id="bible-text" tabindex="-1">
+            <p class="placeholder">Select a book and chapter to begin reading.</p>
+        </main>
+
+        <!-- Bottom Navigation & Download Links -->
+        <footer class="navigation-buttons bottom-nav">
+            <div class="button-group">
+                <button class="prev-btn" disabled>&laquo; Previous</button>
+                <button class="next-btn" disabled>Next &raquo;</button>
+            </div>
+
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
