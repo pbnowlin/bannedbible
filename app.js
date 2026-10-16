@@ -28,6 +28,7 @@ const siteHeader = document.querySelector('.site-header');
 const searchInput = document.getElementById('search-input');
 const searchClear = document.getElementById('search-clear');
 const searchSuggestions = document.getElementById('search-suggestions');
+const searchSuggestionsList = document.getElementById('search-suggestions-list');
 const searchResults = document.getElementById('search-results');
 const searchClose = document.getElementById('search-close');
 const searchResultsCount = document.getElementById('search-results-count');
@@ -312,7 +313,7 @@ function buildSearchIndex() {
 }
 
 function showSuggestions(query) {
-  if (!searchSuggestions || searchIndex.length === 0) return;
+  if (!searchSuggestions || !searchSuggestionsList || searchIndex.length === 0) return;
   
   const results = searchVerses(query, 5);
   
@@ -321,7 +322,7 @@ function showSuggestions(query) {
     return;
   }
   
-  searchSuggestions.innerHTML = '';
+  searchSuggestionsList.innerHTML = '';
   
   results.forEach((result, idx) => {
     const item = document.createElement('div');
@@ -340,7 +341,7 @@ function showSuggestions(query) {
         hideSuggestions();
       }
     });
-    searchSuggestions.appendChild(item);
+    searchSuggestionsList.appendChild(item);
   });
   
   searchSuggestions.hidden = false;
@@ -349,7 +350,9 @@ function showSuggestions(query) {
 function hideSuggestions() {
   if (searchSuggestions) {
     searchSuggestions.hidden = true;
-    searchSuggestions.innerHTML = '';
+  }
+  if (searchSuggestionsList) {
+    searchSuggestionsList.innerHTML = '';
   }
 }
 

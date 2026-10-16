@@ -772,12 +772,15 @@ body {
   top: calc(100% + var(--space-xs));
   left: 0;
   right: 0;
+  z-index: 50;
   background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: 0 4px 12px var(--color-shadow-strong);
   overflow: hidden;
-  z-index: 50;
+}
+
+.search-suggestions-list {
   max-height: 300px;
   overflow-y: auto;
 }
@@ -802,6 +805,14 @@ body {
   background-color: var(--color-accent-light);
   color: var(--color-accent);
   padding: 0 0.125rem;
+}
+
+.search-suggestions-hint {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-light);
+  font-size: 0.8125rem;
 }
 
 /* Search Results */
