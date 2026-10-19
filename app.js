@@ -9,8 +9,6 @@ let searchIndex = [];
 let currentSearchResults = [];
 let currentSearchQuery = '';
 let displayedSearchResultCount = 0;
-const BIBLE_SOURCE = document.documentElement.dataset.bibleSource || './KJVPCE.json';
-const BIBLE_SOURCE_NAME = document.documentElement.dataset.bibleName || 'KJVPCE.json';
 const SEARCH_RESULTS_PAGE_SIZE = 100;
 const DEFAULT_SCRIPTURE_TEXT_SIZE = 1.0625;
 const MIN_SCRIPTURE_TEXT_SIZE = 0.875;
@@ -62,7 +60,7 @@ async function init() {
   setLoading(true);
 
   try {
-    const response = await fetch(BIBLE_SOURCE);
+    const response = await fetch('./KJVPCE.json');
 
     if (!response.ok) {
       throw new Error(`Request failed with status ${response.status}`);
@@ -72,7 +70,7 @@ async function init() {
     BIBLE_DATA = normalizeBibleData(rawData);
 
     if (!BIBLE_DATA.length) {
-      throw new Error(`No books were found in ${BIBLE_SOURCE_NAME}.`);
+      throw new Error('No books were found in KJVPCE.json.');
     }
 
     buildSearchIndex();
@@ -84,7 +82,7 @@ async function init() {
   } catch (error) {
     console.error('Could not load Bible data:', error);
     verseContainer.textContent =
-      `Failed to load ${BIBLE_SOURCE_NAME}. ${error.message}`;
+      `Failed to load KJVPCE.json. ${error.message}`;
     verseContainer.classList.add('error');
   } finally {
     setLoading(false);
