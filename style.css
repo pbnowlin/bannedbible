@@ -591,12 +591,12 @@ body {
 .copyright {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: center;
   gap: var(--space-md);
   margin: var(--space-lg) 0 0;
   font-size: 0.8125rem;
   color: var(--color-text-light);
-  text-align: left;
+  text-align: center;
 }
 
 #privacy-open:link,
