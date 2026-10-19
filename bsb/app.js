@@ -22,6 +22,9 @@ const themeToggle = document.getElementById('theme-toggle');
 const aboutDialog = document.getElementById('about-dialog');
 const aboutOpen = document.getElementById('about-open');
 const aboutClose = document.getElementById('about-close');
+const privacyDialog = document.getElementById('privacy-dialog');
+const privacyOpen = document.getElementById('privacy-open');
+const privacyClose = document.getElementById('privacy-close');
 const scriptureSizeDecrease = document.getElementById('scripture-size-decrease');
 const scriptureSizeIncrease = document.getElementById('scripture-size-increase');
 const siteHeader = document.querySelector('.site-header');
@@ -54,6 +57,7 @@ async function init() {
   setupThemeToggle();
   setupScriptureTextSize();
   setupAboutDialog();
+  setupPrivacyDialog();
   setupHeaderScroll();
   setupSearch();
 
@@ -154,6 +158,22 @@ function setupAboutDialog() {
   });
   aboutDialog.addEventListener('click', (event) => {
     if (event.target === aboutDialog) aboutDialog.close();
+  });
+}
+
+function setupPrivacyDialog() {
+  if (!privacyDialog || !privacyOpen || !privacyClose) return;
+
+  privacyOpen.addEventListener('click', (event) => {
+    event.preventDefault();
+    privacyDialog.showModal();
+  });
+  privacyClose.addEventListener('click', () => privacyDialog.close());
+  privacyDialog.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') privacyDialog.close();
+  });
+  privacyDialog.addEventListener('click', (event) => {
+    if (event.target === privacyDialog) privacyDialog.close();
   });
 }
 
