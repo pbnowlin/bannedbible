@@ -216,11 +216,12 @@ body {
   background: var(--color-bg-elevated);
   color: var(--color-text);
   box-shadow: 0 1.5rem 4rem var(--color-shadow-strong);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .about-dialog[open] {
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .about-dialog::backdrop {
@@ -267,10 +268,7 @@ body {
 }
 
 .about-dialog-content {
-  flex: 1;
-  min-height: 0;
   padding: var(--space-lg);
-  overflow-y: auto;
   font-family: var(--font-serif);
   font-size: 1rem;
   line-height: 1.75;
