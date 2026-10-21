@@ -14,6 +14,8 @@ const DEFAULT_SCRIPTURE_TEXT_SIZE = 1.0625;
 const MIN_SCRIPTURE_TEXT_SIZE = 0.875;
 const MAX_SCRIPTURE_TEXT_SIZE = 1.75;
 const SCRIPTURE_TEXT_SIZE_STEP = 0.125;
+const bibleSource = document.documentElement.dataset.bibleSource || './BSB.json';
+const bibleName = document.documentElement.dataset.bibleName || 'BSB.json';
 
 const bookSelect = document.getElementById('book-select');
 const chapterSelect = document.getElementById('chapter-select');
@@ -64,7 +66,7 @@ async function init() {
   setLoading(true);
 
   try {
-    const response = await fetch('./BSB.json');
+    const response = await fetch(bibleSource);
 
     if (!response.ok) {
       throw new Error(`Request failed with status ${response.status}`);
@@ -74,7 +76,7 @@ async function init() {
     BIBLE_DATA = normalizeBibleData(rawData);
 
     if (!BIBLE_DATA.length) {
-      throw new Error('No books were found in BSB.json.');
+      throw new Error(`No books were found in ${bibleName}.`);
     }
 
     buildSearchIndex();
@@ -86,7 +88,7 @@ async function init() {
   } catch (error) {
     console.error('Could not load Bible data:', error);
     verseContainer.textContent =
-      `Failed to load BSB.json. ${error.message}`;
+      `Failed to load ${bibleName}. ${error.message}`;
     verseContainer.classList.add('error');
   } finally {
     setLoading(false);
