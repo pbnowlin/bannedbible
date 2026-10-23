@@ -1,5 +1,3 @@
-@import url("../reader-theme.css");
-
 *	{margin:0;padding:0}
 html,body	{height:100%;font-size:1.2em;line-height:1.4em;color:black}
 .main	{min-height:100%;margin-bottom:-4em;padding:0.5em}
@@ -255,4 +253,315 @@ html .main .q2 {
 /* Third-level poetry starts 3em from the column edge. */
 html .main .q3 {
     text-indent: -1em;
+}
+
+/* Include padding and borders when calculating element widths. */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    height: auto;
+    min-height: 100%;
+    font-size: 100%;
+    background-color: #204030;
+}
+
+body {
+    height: auto;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    max-width: 72ch;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: #e0ffe0;
+    padding: 0.75rem 1rem 2rem;
+    overflow-wrap: anywhere;
+}
+
+.main {
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+ul.tnav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0;
+}
+
+.tnav a {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.35rem 0.65rem;
+}
+
+.f,
+.x {
+    margin: 1rem 0;
+    line-height: 1.5;
+}
+
+html .main .q,
+html .main .q1,
+html .main .q2 {
+    display: block;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: 4em;
+}
+
+html .main .q,
+html .main .q1 {
+    text-indent: -4em;
+}
+
+html .main .q2 {
+    text-indent: -2em;
+}
+
+html .main .q3 {
+    text-indent: -1em;
+}
+
+body.book-picker-page {
+    width: min(100% - 2rem, 72rem);
+    max-width: none;
+    padding: clamp(1.25rem, 4vw, 3rem) 0;
+}
+
+.book-picker {
+    width: 100%;
+}
+
+.page-header {
+    margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+    text-align: center;
+}
+
+.page-header .eyebrow {
+    margin: 0 0 0.5rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+}
+
+.testament {
+    margin-top: 1.25rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--raised-surface);
+}
+
+.testament h2 {
+    margin: 0 0 1rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.book-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.book-list li {
+    min-width: 0;
+    list-style: none;
+}
+
+.book-link {
+    display: flex;
+    min-height: 2.875rem;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.625rem;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.book-link:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent);
+    background: var(--hover);
+    color: #f3f7fa;
+}
+
+.book-link:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .book-link {
+        transition-duration: 0.01ms;
+    }
+}
+
+:root {
+    color-scheme: dark;
+    --page-background: #0b1220;
+    --surface: #111b2a;
+    --raised-surface: #192638;
+    --text: #e5eaf0;
+    --muted-text: #a6b4c4;
+    --link: #9bc8e8;
+    --accent: #8fc8c0;
+    --border: #34465a;
+    --hover: #315767;
+}
+
+html {
+    background-color: var(--page-background);
+}
+
+html,
+body {
+    color: var(--text);
+}
+
+body {
+    background-color: var(--surface);
+}
+
+.mainindex,
+div.bookList {
+    background-color: var(--raised-surface);
+}
+
+.popup,
+.crpopup {
+    color: var(--text);
+    background-color: var(--raised-surface);
+    border-color: var(--border);
+}
+
+.cd,
+.conc,
+.ebs,
+.ebs1,
+.ebs2,
+.ebs3,
+.is,
+.is1,
+.is2,
+.is3,
+.fm,
+.notemark,
+.f,
+.x,
+.glo,
+.ib,
+.idx,
+.ie,
+.iex,
+.intro,
+.ip,
+.zp,
+.ili,
+.ili1,
+.io,
+.io1,
+.io2,
+.io3,
+.io4,
+.im,
+.imi,
+.imq,
+.imt,
+.imt1,
+.imt2,
+.imt3,
+.imte,
+.iot,
+.ipr,
+.iq,
+.iq1,
+.iq2,
+.iq3,
+.notebackref {
+    color: var(--link);
+}
+
+.wj {
+    color: #f0a6a0;
+}
+
+.fv {
+    color: #e8c98b;
+}
+
+.chapter,
+.chapterlabel {
+    color: var(--accent);
+}
+
+.fine,
+.copyright,
+.figcopr {
+    color: var(--muted-text);
+}
+
+.figref,
+.figCaption {
+    color: #b8c9dc;
+}
+
+ul.cmenu,
+ul.cmenu ul {
+    background-color: var(--raised-surface);
+    border-color: var(--border);
+}
+
+ul.cmenu a,
+ul.cmenu li.dis a:hover,
+ul.cmenu li.sep a:hover {
+    color: var(--text);
+    background-color: var(--surface);
+    border-color: var(--border);
+}
+
+ul.cmenu li:hover > a,
+ul.cmenu li a:hover {
+    color: #f3f7fa;
+    background-color: var(--hover) !important;
+    border-color: var(--hover);
+}
+
+ul.cmenu li.dis a {
+    color: var(--muted-text) !important;
 }
