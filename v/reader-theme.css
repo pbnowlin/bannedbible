@@ -1,0 +1,294 @@
+:root {
+    color-scheme: dark;
+    --page-background: #0b1220;
+    --surface: #111b2a;
+    --raised-surface: #192638;
+    --text: #e5eaf0;
+    --muted-text: #a6b4c4;
+    --link: #9bc8e8;
+    --accent: #8fc8c0;
+    --border: #34465a;
+    --hover: #315767;
+}
+
+html {
+    background-color: var(--page-background) !important;
+}
+
+html body {
+    color: var(--text) !important;
+    background-color: var(--surface) !important;
+}
+
+a:link {
+    color: var(--link);
+}
+
+a:visited {
+    color: #c4b5df;
+}
+
+a:hover {
+    color: #f3f7fa;
+}
+
+a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+html body .mainindex,
+html body div.bookList {
+    color: var(--text);
+    background-color: var(--raised-surface) !important;
+}
+
+html body .popup,
+html body .crpopup {
+    color: var(--text) !important;
+    background-color: var(--raised-surface) !important;
+    border-color: var(--border) !important;
+}
+
+html body .cd,
+html body .conc,
+html body .ebs,
+html body .ebs1,
+html body .ebs2,
+html body .ebs3,
+html body .is,
+html body .is1,
+html body .is2,
+html body .is3,
+html body .fm,
+html body .notemark,
+html body .f,
+html body .x,
+html body .glo,
+html body .ib,
+html body .idx,
+html body .ie,
+html body .iex,
+html body .intro,
+html body .ip,
+html body .zp,
+html body .ili,
+html body .ili1,
+html body .io,
+html body .io1,
+html body .io2,
+html body .io3,
+html body .io4,
+html body .im,
+html body .imi,
+html body .imq,
+html body .imt,
+html body .imt1,
+html body .imt2,
+html body .imt3,
+html body .imte,
+html body .iot,
+html body .ipr,
+html body .iq,
+html body .iq1,
+html body .iq2,
+html body .iq3,
+html body .notebackref {
+    color: var(--link) !important;
+}
+
+html body .wj {
+    color: #f0a6a0 !important;
+}
+
+html body .fv {
+    color: #e8c98b !important;
+}
+
+html body .chapter,
+html body .chapterlabel {
+    color: var(--accent) !important;
+}
+
+html body .fine,
+html body .copyright,
+html body .figcopr {
+    color: var(--muted-text) !important;
+}
+
+html body .figref,
+html body .figCaption {
+    color: #b8c9dc !important;
+}
+
+html body .tnav a {
+    color: var(--link) !important;
+    background-color: var(--raised-surface) !important;
+    border-color: var(--border) !important;
+}
+
+html body .tnav a:visited {
+    color: #c4b5df !important;
+}
+
+html body .tnav a:hover {
+    color: #f3f7fa !important;
+    background-color: var(--hover) !important;
+}
+
+html body ul.cmenu,
+html body ul.cmenu ul {
+    background-color: var(--raised-surface) !important;
+    border-color: var(--border) !important;
+}
+
+html body ul.cmenu a {
+    color: var(--text) !important;
+    background-color: var(--surface) !important;
+    border-color: var(--border) !important;
+}
+
+html body ul.cmenu li:hover > a,
+html body ul.cmenu li a:hover {
+    color: #f3f7fa !important;
+    background-color: var(--hover) !important;
+    border-color: var(--hover) !important;
+}
+
+html body.book-picker-page {
+    width: min(100% - 2rem, 72rem);
+    max-width: none;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: clamp(1.25rem, 4vw, 3rem) 0;
+}
+
+.book-picker {
+    width: 100%;
+}
+
+.page-header {
+    margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+    text-align: center;
+}
+
+.page-header .eyebrow {
+    margin: 0 0 0.5rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+}
+
+.testament {
+    margin-top: 1.25rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--raised-surface);
+}
+
+.testament h2 {
+    margin: 0 0 1rem;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    text-align: left;
+}
+
+.book-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.book-list li {
+    min-width: 0;
+    list-style: none;
+}
+
+.book-link {
+    display: flex;
+    min-height: 2.875rem;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.625rem;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.book-link:link,
+.book-link:visited {
+    color: var(--text);
+}
+
+.book-link:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent);
+    background: var(--hover);
+    color: #f3f7fa;
+}
+
+.book-link:focus-visible,
+.copyright-link:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.picker-footer {
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+    margin-top: 1.25rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted-text);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.reader-resources {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.625rem;
+}
+
+.reader-resources .book-link {
+    min-height: 2.5rem;
+}
+
+.copyright-link {
+    color: var(--muted-text);
+    text-decoration: none;
+}
+
+.copyright-link:hover {
+    color: var(--link);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .book-link {
+        transition-duration: 0.01ms;
+    }
+}

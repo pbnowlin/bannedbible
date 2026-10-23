@@ -1,3 +1,5 @@
+@import url("../reader-theme.css");
+
 *	{margin:0;padding:0}
 html,body	{height:100%;font-size:1.2em;line-height:1.4em;color:black}
 /* Note: if the following 2 .woff files are in another location, please edit the two url() specifiers, below. */
