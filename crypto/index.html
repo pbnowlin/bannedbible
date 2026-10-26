@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="googlebot" content="noindex, nofollow" />
+  <meta http-equiv="X-Robots-Tag" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' blob:; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <!-- PRODUCTION: Replace 'unsafe-inline' with a CSP nonce:
+       1. Generate a random nonce per request: const nonce = crypto.randomUUID();
+       2. Set header: Content-Security-Policy: script-src 'nonce-{nonce}' blob:; style-src 'nonce-{nonce}'
+       3. Add nonce to script tag: <script nonce="{nonce}">
+       4. Move inline script to external file for best security -->
+  <title>Crypto v1.0.1</title>
+  <meta name="theme-color" content="#f2e8d5" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper: #f2e8d5;
+      --paper-input: #f9f3e6;
+      --ink: #000000;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono", "DejaVu Sans Mono", monospace;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px 48px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      border: 1px solid var(--ink);
+      padding: 24px 20px;
+      background: var(--paper);
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .help-toggle {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .help-toggle[aria-expanded="true"] {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .help-panel {
+      font-size: 15px;
+      line-height: 1.6;
+      border: 1px solid var(--ink);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .help-panel h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 20px 0 8px;
+    }
+
+    .help-panel h2:first-child { margin-top: 0; }
+    .help-panel p { margin-bottom: 10px; }
+    .help-panel ul { list-style: disc; padding-left: 20px; margin-bottom: 10px; }
+    .help-panel li { margin-bottom: 6px; }
+    .help-panel strong { font-weight: 700; }
+
+    .mode-switch {
+      display: flex;
+      margin-bottom: 24px;
+    }
+
+    .mode-switch button {
+      flex: 1;
+      min-height: 48px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .mode-switch button + button { border-left: none; }
+
+    .mode-switch button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+      font-weight: 700;
+    }
+
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .field-hint {
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      background: var(--paper-input);
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 10px;
+      outline: none;
+    }
+
+    input[type="text"],
+    input[type="password"] { min-height: 48px; }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    textarea:focus {
+      box-shadow: inset 0 0 0 2px var(--ink);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      word-break: break-word;
+    }
+
+    textarea[readonly] { background: var(--paper); }
+
+    ::placeholder {
+      color: #5c5346;
+      opacity: 1;
+    }
+
+    input[disabled],
+    textarea[disabled],
+    button[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .password-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .password-row input { flex: 1; min-width: 0; }
+
+    .icon-btn {
+      flex-shrink: 0;
+      min-height: 48px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 0 14px;
+      cursor: pointer;
+    }
+
+    .icon-btn[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .strength {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .strength.show { display: block; }
+
+    .strength-track {
+      height: 10px;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0;
+      background: var(--ink);
+    }
+
+    .strength-label {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .strength-label b { font-weight: 700; }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button {
+      font-family: var(--sans);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      min-height: 48px;
+      background: var(--ink);
+      color: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 12px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .btn-ghost {
+      min-height: 48px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      padding: 12px 20px;
+      font-size: 15px;
+    }
+
+    .status {
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 16px 0 0;
+      min-height: 14px;
+      word-break: break-word;
+    }
+
+    .status.error,
+    .status.warn {
+      font-weight: 700;
+      border-left: 4px solid var(--ink);
+      padding-left: 10px;
+    }
+
+    .status.success { font-weight: 700; }
+
+    .notice {
+      font-size: 15px;
+      line-height: 1.5;
+      border: 2px solid var(--ink);
+      padding: 12px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .output-card { display: none; }
+    .output-card.show { display: block; }
+
+    .output-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .output-head h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .output-head .btn-ghost {
+      min-height: 40px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    #output {
+      min-height: 180px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .output-meta {
+      font-size: 14px;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .card { padding: 20px 16px; }
+      h1 { font-size: 1.1rem; }
+      .actions button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="page">
+    <section class="card">
+      <div class="title-row">
+        <h1>Crypto</h1>
+        <button type="button" class="help-toggle" id="help-toggle"
+                aria-expanded="false" aria-controls="help-panel" aria-label="About this tool">?</button>
+      </div>
+
+      <div class="help-panel" id="help-panel" hidden>
+        <h2>What this is</h2>
+        <p>Encrypt a block of text with a password, and decrypt it again with the same password. Everything happens inside this browser tab — nothing is sent anywhere and nothing is saved. Close the tab and nothing is left behind.</p>
+        <p>The result is plain text, so it travels through anything that carries text: email, chat, a note in a file, paper.</p>
+
+        <h2>To encrypt</h2>
+        <ul>
+          <li>Leave the switch set to <strong>Encrypt</strong>.</li>
+          <li>Type or paste your text into <strong>Message</strong>. Up to 1 MiB.</li>
+          <li>Enter a password, then type it again to confirm.</li>
+          <li>Press <strong>Encrypt</strong>, then <strong>Copy</strong> to take the result.</li>
+        </ul>
+        <p>Send the encrypted block to the other person, and give them the password separately — a different app, or in person. Sending both together defeats the point.</p>
+
+        <h2>To decrypt</h2>
+        <ul>
+          <li>Set the switch to <strong>Decrypt</strong>.</li>
+          <li>Paste the whole block into <strong>Encrypted message</strong>, including the BEGIN and END lines.</li>
+          <li>Enter the password and press <strong>Decrypt</strong>.</li>
+        </ul>
+        <p>If it will not open, the password is wrong or the block was altered or cut short on its way to you. Ask the sender to copy it again.</p>
+
+        <h2>Your password</h2>
+        <ul>
+          <li>Twelve characters minimum. Longer is better — a password manager's generator is the easiest way to get a good one.</li>
+          <li>Anyone who has the password can read the message, so pass it along carefully.</li>
+          <li><strong>Keep it somewhere safe before you close this tab.</strong> There is no recovery and no reset. If the password is lost the message cannot be opened again, by you or by anyone.</li>
+        </ul>
+
+        <h2>The other buttons</h2>
+        <p><strong>Clear</strong> empties every field on the page, and <strong>Copy</strong> puts the output on your clipboard. Switching between Encrypt and Decrypt also clears both boxes, so copy anything you want to keep before you switch.</p>
+      </div>
+
+      <p class="notice" id="unsupported-notice" hidden>
+        This browser does not expose the Web Crypto API on this page, so nothing here can run.
+        Web Crypto requires a secure context — open this page over HTTPS.
+      </p>
+
+      <div class="mode-switch" role="group" aria-label="Mode">
+        <button type="button" id="mode-encrypt" aria-pressed="true">Encrypt</button>
+        <button type="button" id="mode-decrypt" aria-pressed="false">Decrypt</button>
+      </div>
+
+      <div class="field">
+        <label for="input-text" id="input-label">Message</label>
+        <textarea id="input-text" spellcheck="false" autocomplete="off"
+                  autocapitalize="off" autocorrect="off"
+                  placeholder="Type or paste the text to encrypt."></textarea>
+        <p class="field-hint" id="input-hint">Up to 1 MiB of text.</p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-row">
+          <input type="password" id="password" autocomplete="new-password"
+                 spellcheck="false" autocapitalize="off" autocorrect="off"
+                 placeholder="At least 12 characters" />
+          <button type="button" class="icon-btn" id="toggle-password" aria-pressed="false">Show</button>
+        </div>
+        <div class="strength" id="strength">
+          <div class="strength-track"><div class="strength-fill" id="strength-fill"></div></div>
+          <p class="strength-label" id="strength-label"></p>
+        </div>
+      </div>
+
+      <div class="field" id="confirm-field">
+        <label for="password-confirm">Confirm password</label>
+        <input type="password" id="password-confirm" autocomplete="new-password"
+               spellcheck="false" autocapitalize="off" autocorrect="off"
+               placeholder="Type it again" />
+        <p class="field-hint">There is no recovery. A typo here would make the message permanently unreadable.</p>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="run-btn">Encrypt</button>
+        <button type="button" class="btn-ghost" id="clear-btn">Clear</button>
+      </div>
+
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="card output-card" id="output-card">
+      <div class="output-head">
+        <h2 id="output-title">Encrypted message</h2>
+        <button type="button" class="btn-ghost" id="copy-btn">Copy</button>
+      </div>
+      <textarea id="output" readonly spellcheck="false" aria-labelledby="output-title"></textarea>
+      <p class="output-meta" id="output-meta"></p>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // Inlined Web Worker script to avoid DOM textContent extraction hacks
+    const WORKER_SOURCE = `
+      self.onmessage = async function(e) {
+        const { mode, passphraseBytes, text } = e.data;
+        const pwArray = new Uint8Array(passphraseBytes);
+
+        const MAGIC = new Uint8Array([0x4E, 0x43, 0x52, 0x59]);  // "NCRY"
+        const FORMAT_VERSION = 1;
+        const KDF_ITERATIONS = 1000000;
+        const SALT_BYTES = 16;
+        const IV_BYTES = 12;
+        const HEADER_BYTES = 39;
+        // Algorithm identifiers for future agility
+        const CIPHER_AES_256_GCM = 1;
+        const KDF_PBKDF2_SHA256 = 1;
+        const BEGIN_LINE = '-----BEGIN NCRYPT ENCRYPTED MESSAGE-----';
+        const END_LINE = '-----END NCRYPT ENCRYPTED MESSAGE-----';
+        const MAX_PLAINTEXT_BYTES = 1024 * 1024;
+        const MAX_ARMORED_CHARS = 4 * 1024 * 1024;
+
+        function zeroize(arr) {
+          if (!arr || !arr.fill) return;
+          // Overwrite with random then zero - prevents dead-store elimination
+          try {
+            self.crypto.getRandomValues(arr);
+          } catch (_) { /* ignore if not available */ }
+          arr.fill(0);
+        }
+
+        function bytesEqual(a, b) {
+          if (a.length !== b.length) return false;
+          let diff = 0;
+          for (let i = 0; i < a.length; i++) {
+            diff |= a[i] ^ b[i];
+          }
+          return diff === 0;
+        }
+
+        function bytesToBase64(bytes) {
+          let bin = '';
+          const chunk = 1024;
+          for (let i = 0; i < bytes.length; i += chunk) {
+            const sub = bytes.subarray(i, i + chunk);
+            for (let j = 0; j < sub.length; j++) {
+              bin += String.fromCharCode(sub[j]);
+            }
+          }
+          return btoa(bin);
+        }
+
+        function base64ToBytes(b64) {
+          const bin = atob(b64.replace(/\\s+/g, ''));
+          const out = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+          return out;
+        }
+
+        async function deriveKey(pwBytes, salt, iterations) {
+          const baseKey = await self.crypto.subtle.importKey('raw', pwBytes, 'PBKDF2', false, ['deriveKey']);
+          return self.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+            baseKey,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt', 'decrypt']
+          );
+        }
+
+        let ptBytes = null;
+
+        try {
+          if (mode === 'encrypt') {
+            const encoder = new TextEncoder();
+            ptBytes = encoder.encode(text);
+
+            if (ptBytes.length > MAX_PLAINTEXT_BYTES) {
+              throw new Error('Message exceeds maximum supported size of 1 MiB.');
+            }
+
+            const salt = self.crypto.getRandomValues(new Uint8Array(SALT_BYTES));
+            const iv = self.crypto.getRandomValues(new Uint8Array(IV_BYTES));
+
+            const header = new Uint8Array(HEADER_BYTES);
+            header.set(MAGIC, 0);
+            header[4] = FORMAT_VERSION;
+            header[5] = CIPHER_AES_256_GCM;
+            new DataView(header.buffer).setUint32(6, KDF_ITERATIONS, false);
+            header[10] = KDF_PBKDF2_SHA256;
+            header.set(salt, 11);
+            header.set(iv, 27);
+
+            const key = await deriveKey(pwArray, salt, KDF_ITERATIONS);
+            const ctBuffer = await self.crypto.subtle.encrypt(
+              { name: 'AES-GCM', iv, additionalData: header, tagLength: 128 },
+              key,
+              ptBytes
+            );
+
+            const ctBytes = new Uint8Array(ctBuffer);
+            const finalBuffer = new Uint8Array(header.length + ctBytes.length);
+            finalBuffer.set(header, 0);
+            finalBuffer.set(ctBytes, header.length);
+
+            const b64 = bytesToBase64(finalBuffer);
+            const armored = \`\${BEGIN_LINE}\\n\${b64.match(/.{1,64}/g).join('\\n')}\\n\${END_LINE}\`;
+
+            self.postMessage({
+              success: true,
+              payload: armored,
+              meta: \`AES-256-GCM · PBKDF2 (\${KDF_ITERATIONS.toLocaleString()} iterations)\`
+            });
+          } else {
+            if (text.length > MAX_ARMORED_CHARS) {
+              throw new Error('Payload exceeds maximum supported size.');
+            }
+
+            const cleanB64 = text.replace(BEGIN_LINE, '').replace(END_LINE, '').replace(/\\s+/g, '');
+            const bytes = base64ToBytes(cleanB64);
+
+            if (bytes.length < HEADER_BYTES) throw new Error('Invalid payload header.');
+
+            const header = bytes.subarray(0, HEADER_BYTES);
+
+            if (!bytesEqual(header.subarray(0, 4), MAGIC)) throw new Error('Invalid payload.');
+            if (header[4] !== FORMAT_VERSION) throw new Error('Unsupported format version.');
+            if (header[5] !== CIPHER_AES_256_GCM) throw new Error('Unsupported cipher.');
+            if (header[10] !== KDF_PBKDF2_SHA256) throw new Error('Unsupported KDF.');
+
+            const claimedIterations = new DataView(header.buffer, header.byteOffset + 6, 4).getUint32(0, false);
+            if (claimedIterations !== KDF_ITERATIONS) throw new Error('Unsupported KDF parameters.');
+
+            const salt = bytes.subarray(11, 27);
+            const iv = bytes.subarray(27, 39);
+            const ciphertext = bytes.subarray(HEADER_BYTES);
+
+            const key = await deriveKey(pwArray, salt, KDF_ITERATIONS);
+            const ptBuffer = await self.crypto.subtle.decrypt(
+              { name: 'AES-GCM', iv, additionalData: header, tagLength: 128 },
+              key,
+              ciphertext
+            );
+
+            const decodedText = new TextDecoder('utf-8', { fatal: true }).decode(ptBuffer);
+
+            self.postMessage({
+              success: true,
+              payload: decodedText,
+              meta: \`Decrypted & Tag Verified · \${KDF_ITERATIONS.toLocaleString()} PBKDF2 iterations\`
+            });
+          }
+        } catch (err) {
+          self.postMessage({
+            success: false,
+            error: 'Could not decrypt. The password is wrong, or the message was altered or truncated in transit.'
+          });
+        } finally {
+          zeroize(pwArray);
+          zeroize(ptBytes);
+        }
+      };
+    `;
+
+    const $ = (id) => document.getElementById(id);
+
+    const helpToggle = $('help-toggle');
+    const helpPanel = $('help-panel');
+    const unsupportedNotice = $('unsupported-notice');
+    const modeEncryptBtn = $('mode-encrypt');
+    const modeDecryptBtn = $('mode-decrypt');
+    const inputLabel = $('input-label');
+    const inputText = $('input-text');
+    const inputHint = $('input-hint');
+    const passwordEl = $('password');
+    const togglePasswordBtn = $('toggle-password');
+    const strengthWrap = $('strength');
+    const strengthFill = $('strength-fill');
+    const strengthLabel = $('strength-label');
+    const confirmField = $('confirm-field');
+    const confirmEl = $('password-confirm');
+    const runBtn = $('run-btn');
+    const clearBtn = $('clear-btn');
+    const statusEl = $('status');
+    const outputCard = $('output-card');
+    const outputTitle = $('output-title');
+    const outputEl = $('output');
+    const outputMeta = $('output-meta');
+    const copyBtn = $('copy-btn');
+
+    let mode = 'encrypt';
+    let busy = false;
+    const MIN_PASSWORD_LENGTH = 12;
+    const BITS_PER_WORD = 11;
+    const PHRASE_RE = /^[A-Za-z]{1,12}(?:[ \-_.][A-Za-z]{1,12}){1,15}$/;
+
+    const supported = !!(
+      window.crypto &&
+      window.crypto.subtle &&
+      typeof window.crypto.subtle.deriveKey === 'function' &&
+      typeof window.crypto.getRandomValues === 'function' &&
+      window.Worker
+    );
+
+    function zeroize(arr) {
+      if (!arr || !arr.fill) return;
+      // Overwrite with random then zero - prevents dead-store elimination
+      try {
+        window.crypto.getRandomValues(arr);
+      } catch (_) { /* ignore if not available */ }
+      arr.fill(0);
+    }
+
+    function charsetEntropyBits(pw) {
+      let pool = 0;
+      if (/[a-z]/.test(pw)) pool += 26;
+      if (/[A-Z]/.test(pw)) pool += 26;
+      if (/[0-9]/.test(pw)) pool += 10;
+      if (/[^A-Za-z0-9]/.test(pw)) pool += 33;
+      if (pool === 0) return 0;
+
+      const seen = new Set(pw);
+      const effective = Math.min(pool, Math.max(seen.size, 2) * 2);
+      return pw.length * (Math.log(effective) / Math.LN2);
+    }
+
+    function phraseEntropyBits(pw) {
+      if (!PHRASE_RE.test(pw)) return null;
+      const words = pw.split(/[ \-_.]+/).filter((w) => w.length > 0);
+      if (words.length < 2) return null;
+      return words.length * BITS_PER_WORD;
+    }
+
+    function estimateStrength(pw) {
+      if (!pw) return { bits: 0, phrase: false };
+      const charBits = charsetEntropyBits(pw);
+      const phraseBits = phraseEntropyBits(pw);
+      if (phraseBits !== null && phraseBits < charBits) {
+        return { bits: phraseBits, phrase: true };
+      }
+      return { bits: charBits, phrase: false };
+    }
+
+    function renderStrength() {
+      const pw = passwordEl.value;
+      if (mode !== 'encrypt' || !pw) {
+        strengthWrap.classList.remove('show');
+        return;
+      }
+      strengthWrap.classList.add('show');
+      const est = estimateStrength(pw);
+      const bits = est.bits;
+      const pct = Math.max(4, Math.min(100, (bits / 128) * 100));
+
+      let word = 'Weak';
+      if (pw.length < MIN_PASSWORD_LENGTH) {
+        word = 'Too short';
+      } else if (bits >= 100) {
+        word = 'Very strong';
+      } else if (bits >= 80) {
+        word = 'Strong';
+      } else if (bits >= 50) {
+        word = 'Fair';
+      }
+
+      strengthFill.style.width = `${pct}%`;
+      strengthLabel.textContent = '';
+      const b = document.createElement('b');
+      b.textContent = word;
+      strengthLabel.appendChild(b);
+      strengthLabel.appendChild(
+        document.createTextNode(
+          ` · at most ~${Math.round(bits)} bits · ${
+            est.phrase
+              ? `priced as a word phrase at ${BITS_PER_WORD} bits per word`
+              : 'upper bound, assuming random choice'
+          }`
+        )
+      );
+    }
+
+    function setStatus(message, kind) {
+      statusEl.textContent = message || '';
+      statusEl.className = 'status' + (kind ? ` ${kind}` : '');
+    }
+
+    function setBusy(on, label) {
+      busy = on;
+      runBtn.disabled = on || !supported;
+      clearBtn.disabled = on;
+      modeEncryptBtn.disabled = on;
+      modeDecryptBtn.disabled = on;
+      runBtn.textContent = on ? label : (mode === 'encrypt' ? 'Encrypt' : 'Decrypt');
+    }
+
+    function hideOutput() {
+      outputCard.classList.remove('show');
+      outputEl.value = '';
+      outputMeta.textContent = '';
+    }
+
+    function showOutput(title, text, meta) {
+      outputTitle.textContent = title;
+      outputEl.value = text;
+      outputMeta.textContent = meta || '';
+      outputCard.classList.add('show');
+    }
+
+    function setMode(next) {
+      if (busy || next === mode) return;
+      mode = next;
+      const encrypting = mode === 'encrypt';
+      modeEncryptBtn.setAttribute('aria-pressed', String(encrypting));
+      modeDecryptBtn.setAttribute('aria-pressed', String(!encrypting));
+      inputLabel.textContent = encrypting ? 'Message' : 'Encrypted message';
+      inputText.placeholder = encrypting
+        ? 'Type or paste the text to encrypt.'
+        : 'Paste the -----BEGIN NCRYPT ENCRYPTED MESSAGE----- block.';
+      inputHint.textContent = encrypting
+        ? 'Up to 1 MiB of text.'
+        : 'The whole block, including the BEGIN and END lines.';
+      passwordEl.placeholder = encrypting ? 'At least 12 characters' : 'The message password';
+      confirmField.hidden = !encrypting;
+      confirmEl.value = '';
+      runBtn.textContent = encrypting ? 'Encrypt' : 'Decrypt';
+      inputText.value = '';
+      hideOutput();
+      setStatus('');
+      renderStrength();
+    }
+
+    function clearAll() {
+      inputText.value = '';
+      passwordEl.value = '';
+      confirmEl.value = '';
+      hideOutput();
+      renderStrength();
+    }
+
+    function run() {
+      if (busy || !supported) return;
+
+      const runMode = mode;
+      // Read password and immediately convert to bytes to minimize string lifetime
+      const password = passwordEl.value;
+      const text = inputText.value;
+
+      if (runMode === 'encrypt') {
+        if (!text.trim()) { setStatus('There is no text to encrypt.', 'error'); return; }
+        if (password.length < MIN_PASSWORD_LENGTH) {
+          setStatus(`Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`, 'error');
+          return;
+        }
+        if (password !== confirmEl.value) {
+          setStatus('The two passwords do not match.', 'error');
+          return;
+        }
+      } else {
+        if (!text.trim()) { setStatus('Paste an encrypted message first.', 'error'); return; }
+        if (!password) { setStatus('Enter the message password.', 'error'); return; }
+      }
+
+      // Convert password to bytes immediately, then clear DOM
+      const pwBytes = new TextEncoder().encode(password.normalize('NFC'));
+
+      // Clear password DOM elements immediately
+      passwordEl.value = '';
+      confirmEl.value = '';
+
+      hideOutput();
+      setBusy(true, 'Working…');
+      setStatus('Deriving key on background worker thread...', 'success');
+
+      const blob = new Blob([WORKER_SOURCE], { type: 'text/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      const worker = new Worker(workerUrl);
+
+      URL.revokeObjectURL(workerUrl);
+
+      worker.onmessage = function (e) {
+        worker.terminate();
+        setBusy(false);
+
+        if (e.data.success) {
+          if (runMode === 'encrypt') {
+            showOutput('Encrypted message', e.data.payload, e.data.meta);
+            setStatus('Encrypted. Send the block below; send the password some other way.', 'success');
+          } else {
+            showOutput('Decrypted message', e.data.payload, e.data.meta);
+            setStatus('Decrypted, and the authentication tag verified — the message was not altered.', 'success');
+          }
+        } else {
+          setStatus(e.data.error, 'error');
+          hideOutput();
+        }
+      };
+
+      // Transfer buffer to worker to eliminate main thread retention
+      const bufferToTransfer = pwBytes.buffer;
+      worker.postMessage({
+        mode: runMode,
+        passphraseBytes: bufferToTransfer,
+        text: text
+      }, [bufferToTransfer]);
+
+      // Wipe local byte array reference on main thread
+      zeroize(pwBytes);
+    }
+
+    async function copyOutput() {
+      const text = outputEl.value;
+      if (!text) return;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          outputEl.select();
+        }
+        copyBtn.textContent = 'Copied';
+      } catch (err) {
+        copyBtn.textContent = 'Copy failed';
+      } finally {
+        setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1600);
+      }
+    }
+
+    helpToggle.addEventListener('click', () => {
+      const open = helpToggle.getAttribute('aria-expanded') === 'true';
+      helpToggle.setAttribute('aria-expanded', String(!open));
+      helpPanel.hidden = open;
+    });
+
+    modeEncryptBtn.addEventListener('click', () => setMode('encrypt'));
+    modeDecryptBtn.addEventListener('click', () => setMode('decrypt'));
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const showing = passwordEl.type === 'text';
+      passwordEl.type = showing ? 'password' : 'text';
+      confirmEl.type = showing ? 'password' : 'text';
+      togglePasswordBtn.textContent = showing ? 'Show' : 'Hide';
+      togglePasswordBtn.setAttribute('aria-pressed', String(!showing));
+    });
+
+    passwordEl.addEventListener('input', renderStrength);
+    runBtn.addEventListener('click', run);
+    clearBtn.addEventListener('click', () => {
+      clearAll();
+      setStatus('Cleared.', '');
+    });
+    copyBtn.addEventListener('click', copyOutput);
+
+    const enterToRun = (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        run();
+      }
+    };
+
+    passwordEl.addEventListener('keydown', enterToRun);
+    confirmEl.addEventListener('keydown', enterToRun);
+    window.addEventListener('pagehide', clearAll);
+
+    if (!supported) {
+      unsupportedNotice.hidden = false;
+      runBtn.disabled = true;
+      inputText.disabled = true;
+      passwordEl.disabled = true;
+      confirmEl.disabled = true;
+    }
+  })();
+  </script>
+
+</body>
+</html>

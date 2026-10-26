@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <title>Notes</title>
+
+  <script src="./vendor/tailwind.min.js" integrity="sha384-igm5BeiBt36UU4gqwWS7imYmelpTsZlQ45FZf+XBn9MuJbn4nQr7yx1yFydocC/K"></script>
+  <script src="./vendor/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#16a34a',
+              600: '#15803d',
+              700: '#166534',
+            }
+          }
+        }
+      }
+    };
+
+    // darkMode is 'class', so something has to set the class. Follow the system setting.
+    (function () {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      function apply() { document.documentElement.classList.toggle('dark', mq.matches); }
+      apply();
+      if (mq.addEventListener) mq.addEventListener('change', apply);
+      else if (mq.addListener) mq.addListener(apply);
+    })();
+  </script>
+
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.5); }
+
+    /* Folder row actions: hover / keyboard focus on pointer devices, always visible on touch */
+    .folder-actions { display: none; align-items: center; }
+    .folder-item:hover .folder-actions { display: flex; }
+    .folder-item:hover .folder-count { display: none; }
+    .folder-item:has(:focus-visible) .folder-actions { display: flex; }
+    .folder-item:has(:focus-visible) .folder-count { display: none; }
+    .folder-item[draggable="true"] { cursor: grab; }
+    .folder-item.is-dragging { opacity: 0.45; cursor: grabbing; }
+    .folder-item.is-drop-target { background: rgba(22, 163, 74, 0.12); box-shadow: inset 0 0 0 1px rgba(22, 163, 74, 0.45); }
+    .folder-branch { margin-left: 0.85rem; padding-left: 0.35rem; border-left: 1px solid rgba(148, 163, 184, 0.28); }
+    #folders-root-drop.is-drop-target { background: rgba(22, 163, 74, 0.1); border-radius: 0.5rem; }
+    .folder-root-hint { display: none; }
+    #folders-root-drop.is-drop-target .folder-root-hint { display: inline; }
+    @media (hover: none) {
+      .folder-actions { display: flex !important; }
+      .folder-count { display: inline-block !important; }
+    }
+
+    /* 16px form controls stop iOS Safari from auto-zooming on focus, so zoom stays available */
+    @media (max-width: 767px) {
+      input:not(#note-title-input), textarea, select { font-size: 16px !important; }
+    }
+
+    /* Modal focus trap helper */
+    #modal-backdrop[aria-hidden="false"] ~ * { pointer-events: none; }
+
+    /* Premium polish */
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.12), transparent 30%),
+        linear-gradient(180deg, #f4f7fb 0%, #ebf3f0 100%);
+      transition: background 220ms ease;
+    }
+    .dark body {
+      background:
+        radial-gradient(circle at top left, rgba(22, 163, 74, 0.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.14), transparent 26%),
+        linear-gradient(180deg, #020817 0%, #0b1120 100%);
+    }
+    #sidebar, #notes-panel, #editor-panel, #modal-card {
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.06);
+    }
+    #editor-panel {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(10px);
+    }
+    .dark #editor-panel {
+      background: rgba(2, 6, 23, 0.7);
+    }
+    .nav-item, .folder-item, .note-item, .action-button, .icon-button, #btn-new-note, #btn-save-note {
+      transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    }
+    .nav-item:hover, .folder-item:hover, .note-item:hover, .action-button:hover, .icon-button:hover, #btn-new-note:hover, #btn-save-note:hover {
+      transform: translateY(-1px);
+    }
+    .note-item {
+      border-radius: 0.9rem;
+      margin: 0.35rem 0.5rem;
+      border: 1px solid transparent;
+    }
+    .note-item.active-note {
+      border-color: rgba(22, 163, 74, 0.25);
+      box-shadow: 0 14px 28px rgba(22, 163, 74, 0.08);
+    }
+    #note-title-input:focus,
+    #note-body-input:focus,
+    #search-input:focus,
+    #note-folder-select:focus {
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+    }
+    #note-body-input {
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02));
+      border-radius: 1rem;
+      padding: 0.5rem 0.75rem;
+    }
+    .dark #note-body-input {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.16), rgba(15, 23, 42, 0.02));
+    }
+    .save-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: all 180ms ease;
+    }
+    .dark .save-indicator {
+      background: rgba(15, 23, 42, 0.7);
+      border-color: rgba(148, 163, 184, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .save-indicator::before {
+      content: '';
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 9999px;
+      background: #94a3b8;
+      box-shadow: 0 0 0 0 rgba(148, 163, 184, 0.25);
+      transition: all 180ms ease;
+    }
+    .save-indicator[data-state="saved"] {
+      color: #166534;
+      background: rgba(220, 252, 231, 0.8);
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+    .save-indicator[data-state="saved"]::before {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    }
+    .save-indicator[data-state="saving"] {
+      color: #1d4ed8;
+      background: rgba(219, 234, 254, 0.8);
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+    .save-indicator[data-state="saving"]::before {
+      background: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+      animation: pulse-dot 1.15s ease-in-out infinite;
+    }
+    .save-indicator[data-state="unsaved"] {
+      color: #a16207;
+      background: rgba(254, 249, 195, 0.8);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .save-indicator[data-state="unsaved"]::before {
+      background: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+    }
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased h-full flex overflow-hidden select-none" style="height:100vh;height:100dvh">
+
+  <!-- Mobile navigation overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-gray-900/40 z-30 hidden md:hidden transition-opacity backdrop-blur-sm"></div>
+
+  <!-- Column 1: Sidebar -->
+  <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex-shrink-0">
+    <div class="h-14 px-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center space-x-2.5">
+        <div class="p-1.5 bg-brand-500 text-white rounded-md shadow-sm">
+          <i data-lucide="notebook-pen" class="w-4 h-4"></i>
+        </div>
+        <span class="font-bold text-base tracking-tight">Workspace</span>
+      </div>
+      <button type="button" id="close-mobile-sidebar" aria-label="Close menu" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden text-gray-500">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="p-3 flex-shrink-0">
+      <button type="button" id="btn-new-note" class="w-full py-2 px-3 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white font-medium text-sm rounded-lg shadow-sm flex items-center justify-center space-x-2 transition-colors">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span>New Note</span>
+      </button>
+    </div>
+
+    <div class="px-3 pb-2 flex-shrink-0">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400 pointer-events-none"></i>
+        <input type="search" id="search-input" placeholder="Search notes..." aria-label="Search notes" autocomplete="off" class="w-full pl-9 pr-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800/60 border border-transparent focus:border-brand-500 rounded-lg focus:outline-none transition-colors">
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-4">
+      <div>
+        <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2 mb-1.5">Views</div>
+        <nav class="space-y-0.5">
+          <button type="button" data-filter="all" class="nav-item">
+            <span class="flex items-center space-x-2.5">
+              <i data-lucide="files" class="w-4 h-4"></i>
+              <span>All Notes</span>
+            </span>
+            <span id="count-all" class="text-xs px-2 py-0.5 rounded-md bg-gray-200/60 dark:bg-gray-800 text-gray-600 dark:text-gray-400">0</span>
+          </button>
+          <button type="button" data-filter="uncategorized" class="nav-item">
+            <span class="flex items-center space-x-2.5">
+              <i data-lucide="inbox" class="w-4 h-4"></i>
+              <span>Uncategorized</span>
+            </span>
+            <span id="count-uncategorized" class="text-xs px-2 py-0.5 rounded-md bg-gray-200/60 dark:bg-gray-800 text-gray-600 dark:text-gray-400">0</span>
+          </button>
+          <button type="button" data-filter="trash" class="nav-item">
+            <span class="flex items-center space-x-2.5">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span>Trash</span>
+            </span>
+            <span id="count-trash" class="text-xs px-2 py-0.5 rounded-md bg-gray-200/60 dark:bg-gray-800 text-gray-600 dark:text-gray-400">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <div>
+        <div id="folders-root-drop" class="flex items-center justify-between px-2 mb-1.5 py-1 -my-1 transition-colors" data-drop-root="true">
+          <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Folders</span>
+          <span class="flex items-center gap-1">
+            <span class="folder-root-hint text-[10px] text-brand-600 dark:text-brand-400">Move to top level</span>
+            <button type="button" id="btn-add-folder" title="Create folder" aria-label="Create folder" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+              <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
+            </button>
+          </span>
+        </div>
+        <div id="folders-container" class="space-y-0.5"></div>
+      </div>
+    </div>
+
+    <div class="p-3 border-t border-gray-200 dark:border-gray-800 flex items-center space-x-2 flex-shrink-0">
+      <button type="button" id="btn-export-data" class="flex-1 flex items-center justify-center space-x-1.5 py-1.5 px-2 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/60 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors" title="Export backup (JSON)">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span>Export</span>
+      </button>
+      <button type="button" id="btn-import-data" class="flex-1 flex items-center justify-center space-x-1.5 py-1.5 px-2 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/60 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors" title="Import backup (JSON)">
+        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+        <span>Import</span>
+      </button>
+      <input type="file" id="file-import-input" accept=".json,application/json" class="hidden">
+    </div>
+  </aside>
+
+  <!-- Column 2: Notes list -->
+  <section id="notes-panel" class="w-full md:w-72 lg:w-80 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 flex flex-col flex-shrink-0 h-full z-10">
+    <div class="h-14 px-3.5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center space-x-2 min-w-0">
+        <button type="button" id="open-mobile-sidebar" aria-label="Open menu" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden text-gray-600 dark:text-gray-300">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <h2 id="current-view-title" class="font-bold text-sm text-gray-800 dark:text-gray-200 truncate">All Notes</h2>
+      </div>
+      <div id="notes-count-badge" class="text-xs text-gray-400 font-medium flex-shrink-0">0 notes</div>
+    </div>
+
+    <div id="notes-list" class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800/40 select-text"></div>
+  </section>
+
+  <!-- Column 3: Editor -->
+  <main id="editor-panel" class="fixed inset-0 md:static md:flex-1 bg-white dark:bg-gray-900 flex flex-col h-full min-w-0 z-20 md:z-auto transform translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+    <div id="editor-wrapper" class="flex-1 flex flex-col h-full min-h-0 select-text">
+      <div class="h-14 px-3 md:px-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between gap-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md flex-shrink-0 z-10">
+        <div class="flex items-center space-x-2 min-w-0 flex-1">
+          <button type="button" id="btn-back-to-list" aria-label="Back to notes" class="p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg md:hidden">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <div class="relative inline-block max-w-[180px] sm:max-w-xs">
+            <select id="note-folder-select" aria-label="Folder" class="max-w-full text-xs font-medium bg-gray-100 dark:bg-gray-800/80 border border-transparent focus:border-brand-500 rounded-lg px-2.5 py-1.5 text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer truncate">
+              <option value="">Uncategorized</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+          <span id="last-saved" class="hidden sm:inline save-indicator mr-1" title="Save status" data-state="saved"></span>
+          <span id="dirty-dot" class="hidden w-2 h-2 rounded-full bg-amber-300 shadow-[0_0_0_4px_rgba(245,158,11,0.15)]" title="Unsaved changes"></span>
+
+          <button type="button" id="btn-restore-note" class="hidden p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-950/20 rounded-lg transition-colors" title="Restore note" aria-label="Restore note">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+
+          <button type="button" id="btn-copy-note" aria-label="Copy note content" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Copy content">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+
+          <button type="button" id="btn-delete-note" aria-label="Delete note" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Delete note">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col min-h-0 p-4 sm:p-6 overflow-hidden">
+        <input type="text" id="note-title-input" placeholder="Note title..." aria-label="Note title" maxlength="500" autocomplete="off" class="text-xl sm:text-2xl font-bold bg-transparent border-none outline-none focus:outline-none mb-3 placeholder-gray-300 dark:placeholder-gray-600 text-gray-900 dark:text-gray-100 tracking-tight rounded-xl">
+        <textarea id="note-body-input" placeholder="Start typing your note here..." aria-label="Note body" class="flex-1 min-h-0 w-full bg-transparent border-none outline-none focus:outline-none resize-none font-mono text-sm leading-relaxed text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-gray-600 rounded-xl"></textarea>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden flex-1 flex-col items-center justify-center p-6 text-center text-gray-400 select-none">
+      <div class="w-12 h-12 bg-gray-100 dark:bg-gray-800/60 rounded-full flex items-center justify-center mb-3">
+        <i data-lucide="file-text" class="w-6 h-6 text-gray-400"></i>
+      </div>
+      <h3 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">No note selected</h3>
+      <p class="text-xs text-gray-500 max-w-xs mb-4">Choose a note from the list or create a new one to begin editing.</p>
+      <button type="button" id="btn-empty-new-note" class="py-2 px-4 bg-brand-500 hover:bg-brand-600 text-white text-xs font-medium rounded-lg shadow-sm">Create new note</button>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-gray-900/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm" aria-hidden="true">
+    <div id="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden p-5 sm:p-6">
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toast-container" role="status" aria-live="polite" class="fixed bottom-4 right-4 z-[60] flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    /* ------------------------------------------------------------------ *
+     * Constants & helpers
+     * ------------------------------------------------------------------ */
+    const STORAGE_KEY = 'notes_app_data_v2';   // unchanged — existing notes carry over
+    const STORAGE_HMAC_KEY = 'notes_app_storage_hmac_v1';
+    const STORAGE_HMAC_SUFFIX = '_hmac';
+    const KDF_ITERATIONS = 600000;             // used for new encrypted backups
+    const LEGACY_KDF_ITERATIONS = 100000;      // backups written by the old version
+    const MAX_KDF_ITERATIONS = 5000000;        // refuse absurd values from crafted files
+    const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
+    const MAX_TITLE = 500;
+    const MAX_FOLDER_NAME = 100;
+    const MAX_BODY_BYTES = 2 * 1024 * 1024;    // soft limit per note (~2 MB)
+    const TRASH_FOLDER_ID = 'trash';
+    const TRASH_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+    const OLD_WELCOME_NOTE_BODY = 'Welcome to Notes!\n\nA fast, local-first note-taking app.\n\nKey features:\n- Manual saving (Ctrl+S / Cmd+S)\n- Client-side privacy (nothing leaves your browser)\n- Encrypted backups (AES-256-GCM)\n- Plain text editing with no markdown preview needed';
+    const WELCOME_NOTE_BODY = 'Welcome to Notes\n\nPRIVACY AND SECURITY\nYour notes are stored locally in this browser and are not uploaded to an account or server. Browser storage is not encrypted at rest, so protect access to your device and browser profile.\n\nYou can export a backup at any time. Choose an encrypted backup to protect its contents with a passphrase (AES-256-GCM). Keep the passphrase safe; it cannot be recovered.\n\nUSING THE APP\n- Select New Note to write. Changes save automatically.\n- Create folders with the folder-plus button. Use the folder actions to add subfolders, rename, move, or send a folder to Trash.\n- Drag a folder onto another folder to nest it, or onto the Folders heading to move it to the top level. On touch devices, use the Move folder action.\n- Delete a note to move it to Trash. Restore it there, or leave it to be permanently removed after 30 days.\n- Use Export and Import to make or restore backups.';
+    const PASS_MIN_LENGTH = 12;
+    const PASS_CLASSES_REQUIRED = 3;
+    const AUTOSAVE_DELAY_MS = 600;
+    const RESERVED_FILTERS = new Set(['all', 'uncategorized', 'trash']);
+    const cryptoRateLimiter = { limit: 5, windowMs: 5 * 60 * 1000, attempts: [] };
+
+    const NAV_BASE = 'nav-item w-full flex items-center justify-between px-2.5 py-1.5 text-sm rounded-lg font-medium transition-colors ';
+    const ACTIVE_CLS = 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-500';
+    const IDLE_CLS = 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50';
+    const BADGE_CLS = 'text-xs px-2 py-0.5 rounded-md bg-gray-200/60 dark:bg-gray-800 text-gray-600 dark:text-gray-400';
+    const BTN_GHOST = 'px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg';
+    const BTN_PRIMARY = 'px-3.5 py-1.5 text-xs font-medium bg-brand-500 hover:bg-brand-600 text-white rounded-lg disabled:opacity-60';
+    const BTN_DANGER = 'px-3.5 py-1.5 text-xs font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg';
+    const INPUT_CLS = 'w-full px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 border border-transparent focus:border-brand-500 rounded-lg focus:outline-none';
+
+    const $ = (id) => document.getElementById(id);
+
+    // HTML-escape for text AND attribute contexts.
+    const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' };
+    const esc = (v) => String(v ?? '').replace(/[&<>"'`]/g, (c) => ESC_MAP[c]);
+
+    function scorePassphrase(passphrase) {
+      const value = String(passphrase ?? '');
+      let score = 0;
+      if (value.length >= PASS_MIN_LENGTH) score += 1;
+      if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score += 1;
+      if (/\d/.test(value)) score += 1;
+      if (/[^a-zA-Z0-9]/.test(value)) score += 1;
+      return score;
+    }
+
+    function isStrongPassphrase(passphrase) {
+      const value = String(passphrase ?? '');
+      if (value.length < PASS_MIN_LENGTH) return false;
+      const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) => re.test(value)).length;
+      return classes >= PASS_CLASSES_REQUIRED;
+    }
+
+    const toText = (v) =>
+      typeof v === 'string' ? v : (typeof v === 'number' || typeof v === 'boolean') ? String(v) : '';
+
+    function generateId() {
+      if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+      // Fallback: still collision-resistant enough for single-user local use
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 11);
+    }
+
+    /** Simple debounce */
+    function debounce(fn, ms) {
+      let t;
+      return function (...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), ms);
+      };
+    }
+
+    /** Fold diacritics for search (NFD + strip combining marks) */
+    function fold(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+    }
+
+    /* ------------------------------------------------------------------ *
+     * State
+     *   editingId = the note whose content is currently loaded in the editor.
+     *   Saves always go to editingId, never to "whatever is selected now".
+     * ------------------------------------------------------------------ */
+    const state = {
+      folders: [],
+      notes: [],
+      activeNoteId: null,
+      activeFilter: 'all',
+      searchQuery: '',
+    };
+    let editingId = null;
+    let draggedFolderId = null;
+    const editorState = {
+      dirty: false,
+      isSaving: false,
+      lastSavedAt: null,
+    };
+    let lastFocused = null;
+    let lastSavedAt = null; // Date.now() of last successful save for the current note
+
+    const getNote = (id) => (id == null ? undefined : state.notes.find((n) => n.id === id));
+    const getFolder = (id) => (id ? state.folders.find((f) => f.id === id) : undefined);
+    const isValidFilter = (f) => RESERVED_FILTERS.has(f) || !!getFolder(f);
+
+    function collectDescendantFolderIds(rootFolderId) {
+      const ids = new Set();
+      const queue = [rootFolderId];
+      while (queue.length) {
+        const current = queue.shift();
+        if (!current || ids.has(current)) continue;
+        ids.add(current);
+        state.folders.filter((folder) => folder.parentId === current).forEach((folder) => queue.push(folder.id));
+      }
+      ids.delete(rootFolderId);
+      return ids;
+    }
+
+    function cleanupExpiredTrash() {
+      const now = Date.now();
+      const expiredNoteIds = new Set(
+        state.notes
+          .filter((note) => note.folderId === TRASH_FOLDER_ID && Number.isFinite(note.deletedAt) && now - note.deletedAt > TRASH_RETENTION_MS)
+          .map((note) => note.id)
+      );
+      if (expiredNoteIds.size) state.notes = state.notes.filter((note) => !expiredNoteIds.has(note.id));
+    }
+
+    /* ------------------------------------------------------------------ *
+     * UI helpers: icons, toasts
+     * ------------------------------------------------------------------ */
+    function icons(root) {
+      if (window.lucide) {
+        // Prefer scoping to a container when possible to avoid full-document scans
+        window.lucide.createIcons({ root: root || document.body });
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = $('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900',
+        success: 'bg-emerald-600 text-white',
+        error: 'bg-red-600 text-white',
+      };
+      toast.className = `px-3.5 py-2 rounded-lg text-xs font-medium shadow-md transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto ${colors[type] || colors.info}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, type === 'error' ? 4000 : 2500);
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Crypto (AES-256-GCM, key from PBKDF2-SHA256)
+     * ------------------------------------------------------------------ */
+    const toB64 = (buffer) => {
+      const bytes = new Uint8Array(buffer);
+      let s = '';
+      for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+      return btoa(s);
+    };
+    const fromB64 = (str) => Uint8Array.from(atob(str), (c) => c.charCodeAt(0));
+
+    function requireCrypto() {
+      if (!(window.crypto && window.crypto.subtle)) {
+        throw new Error('Encryption needs a secure (https) page.');
+      }
+    }
+
+    function enforceCryptoRateLimit() {
+      const now = Date.now();
+      cryptoRateLimiter.attempts = cryptoRateLimiter.attempts.filter((ts) => now - ts < cryptoRateLimiter.windowMs);
+      if (cryptoRateLimiter.attempts.length >= cryptoRateLimiter.limit) {
+        throw new Error('Too many crypto attempts. Please wait a few minutes and try again.');
+      }
+      cryptoRateLimiter.attempts.push(now);
+    }
+
+    async function deriveKey(passphrase, salt, iterations) {
+      const enc = new TextEncoder();
+      const material = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+        material,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+
+    async function signData(data) {
+      const key = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(STORAGE_HMAC_KEY),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign', 'verify']
+      );
+      const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
+      return btoa(String.fromCharCode(...new Uint8Array(signature)));
+    }
+
+    async function verifyDataSignature(rawValue, expectedSignature) {
+      if (!rawValue || !expectedSignature) return false;
+      const actual = await signData(rawValue);
+      return actual === expectedSignature;
+    }
+
+    async function encryptData(text, passphrase) {
+      requireCrypto();
+      enforceCryptoRateLimit();
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(passphrase, salt, KDF_ITERATIONS);
+      const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(text));
+      return JSON.stringify({
+        encrypted: true,
+        version: 1,
+        algo: 'AES-256-GCM',
+        kdf: 'PBKDF2-SHA256',
+        iterations: KDF_ITERATIONS,
+        salt: toB64(salt),
+        iv: toB64(iv),
+        ciphertext: toB64(ciphertext),
+      });
+    }
+
+    async function decryptData(payload, passphrase) {
+      requireCrypto();
+      enforceCryptoRateLimit();
+      if (!payload || typeof payload !== 'object' || typeof payload.salt !== 'string' || typeof payload.iv !== 'string' || typeof payload.ciphertext !== 'string') {
+        throw new Error('Unsupported backup format.');
+      }
+      const version = Number(payload.version ?? 1);
+      if (!Number.isInteger(version) || version < 1) throw new Error('Unsupported backup format.');
+      const iterations = payload.iterations === undefined ? LEGACY_KDF_ITERATIONS : payload.iterations;
+      if (!Number.isInteger(iterations) || iterations < 1 || iterations > MAX_KDF_ITERATIONS) {
+        throw new Error('Unsupported backup format.');
+      }
+      let salt; let iv; let ciphertext;
+      try {
+        salt = fromB64(payload.salt);
+        iv = fromB64(payload.iv);
+        ciphertext = fromB64(payload.ciphertext);
+      } catch (err) {
+        throw new Error('Unsupported backup format.');
+      }
+      if (salt.length !== 16 || iv.length !== 12 || ciphertext.length === 0) {
+        throw new Error('Unsupported backup format.');
+      }
+      try {
+        const key = await deriveKey(passphrase, salt, iterations);
+        const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+        return new TextDecoder().decode(plain);
+      } catch (err) {
+        throw new Error('Wrong passphrase or corrupted file.');
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Data: validation, load, save
+     * ------------------------------------------------------------------ */
+
+    // Turns any input (localStorage, imported file) into clean, internally consistent data:
+    // string ids, valid timestamps, no duplicate ids, no notes pointing at missing folders.
+    function sanitizeData(input) {
+      if (!input || typeof input !== 'object' || (!Array.isArray(input.notes) && !Array.isArray(input.folders))) {
+        throw new Error('Invalid backup structure.');
+      }
+
+      const folders = [];
+      const folderIds = new Set();
+      const idRemap = new Map();
+      const rawParentMap = new Map();
+      for (const f of Array.isArray(input.folders) ? input.folders : []) {
+        if (!f || typeof f !== 'object' || !Object.prototype.hasOwnProperty.call(f, 'id')) continue;
+        const original = f.id != null && f.id !== '' ? String(f.id) : generateId();
+        if (folderIds.has(original) && !idRemap.has(original)) continue;   // duplicate id: keep the first
+        let id = original;
+        if (RESERVED_FILTERS.has(id)) id = generateId();                   // would collide with built-in views
+        idRemap.set(original, id);
+        if (folderIds.has(id)) continue;
+        folderIds.add(id);
+        const rawParent = f.parentId != null && f.parentId !== '' ? String(f.parentId) : null;
+        rawParentMap.set(id, rawParent && rawParent !== id ? rawParent : null);
+        folders.push({
+          id,
+          name: toText(f.name).trim().slice(0, MAX_FOLDER_NAME) || 'Untitled Folder',
+          parentId: null,
+        });
+      }
+
+      const folderMap = new Map(folders.map((folder) => [folder.id, folder]));
+      for (const folder of folders) {
+        const parentId = rawParentMap.get(folder.id);
+        const resolvedParent = parentId ? (idRemap.get(parentId) ?? parentId) : null;
+        if (!resolvedParent || resolvedParent === folder.id || !folderMap.has(resolvedParent)) {
+          folder.parentId = null;
+          continue;
+        }
+
+        let cursor = resolvedParent;
+        let loopDetected = false;
+        while (cursor && cursor !== folder.id) {
+          const nextParent = rawParentMap.get(cursor);
+          if (!nextParent) break;
+          const mappedParent = idRemap.get(nextParent) ?? nextParent;
+          if (mappedParent === folder.id) {
+            loopDetected = true;
+            break;
+          }
+          cursor = mappedParent;
+        }
+        folder.parentId = loopDetected ? null : resolvedParent;
+      }
+
+      const byId = new Map();
+      for (const n of Array.isArray(input.notes) ? input.notes : []) {
+        if (!n || typeof n !== 'object' || !Object.prototype.hasOwnProperty.call(n, 'id')) continue;
+        const id = n.id != null && n.id !== '' ? String(n.id) : generateId();
+        const updated = Number(n.updatedAt);
+        const rawFolder = n.folderId != null && n.folderId !== '' ? String(n.folderId) : null;
+        const folderId = rawFolder ? (rawFolder === TRASH_FOLDER_ID ? TRASH_FOLDER_ID : (idRemap.get(rawFolder) ?? rawFolder)) : null;
+        let body = toText(n.body);
+        // Soft-truncate oversized bodies on import/load so storage stays usable
+        if (new TextEncoder().encode(body).length > MAX_BODY_BYTES) {
+          body = body.slice(0, Math.floor(MAX_BODY_BYTES * 0.9)); // approximate; UTF-16 safe enough
+        }
+        const note = {
+          id,
+          folderId: folderId && (folderIds.has(folderId) || folderId === TRASH_FOLDER_ID) ? folderId : null,
+          title: toText(n.title).slice(0, MAX_TITLE),
+          body,
+          updatedAt: Number.isFinite(updated) && updated > 0 ? updated : Date.now(),
+          deletedAt: Number.isFinite(Number(n.deletedAt)) && Number(n.deletedAt) > 0 ? Number(n.deletedAt) : undefined,
+        };
+        const existing = byId.get(id);
+        if (!existing || note.updatedAt > existing.updatedAt) byId.set(id, note);
+      }
+
+      return { folders, notes: [...byId.values()] };
+    }
+
+    async function loadData() {
+      let raw = null;
+      try {
+        raw = localStorage.getItem(STORAGE_KEY);
+      } catch (err) {
+        console.error('localStorage unavailable:', err);
+        showToast('Storage is unavailable; notes will not persist', 'error');
+      }
+
+      if (raw) {
+        const signature = localStorage.getItem(`${STORAGE_KEY}${STORAGE_HMAC_SUFFIX}`);
+        if (signature) {
+          try {
+            const valid = await verifyDataSignature(raw, signature);
+            if (!valid) {
+              const backup = localStorage.getItem(`${STORAGE_KEY}_backup`);
+              const replacement = backup && backup !== raw ? backup : null;
+              console.warn('Saved data failed localStorage integrity verification.');
+              if (replacement) {
+                raw = replacement;
+              } else {
+                try { localStorage.setItem(`${STORAGE_KEY}_corrupt_${Date.now()}`, raw); } catch (e) { /* best effort */ }
+                throw new Error('Storage integrity check failed.');
+              }
+            }
+          } catch (err) {
+            console.error('Saved data could not be verified:', err);
+            showToast('Saved data was tampered with and a backup copy was preserved.', 'error');
+          }
+        }
+
+        try {
+          const clean = sanitizeData(JSON.parse(raw));
+          state.folders = clean.folders;
+          state.notes = clean.notes;
+          cleanupExpiredTrash();
+          const welcomeNote = getNote('n-welcome');
+          if (welcomeNote && welcomeNote.title === 'Welcome to Notes' && welcomeNote.body === OLD_WELCOME_NOTE_BODY) {
+            welcomeNote.body = WELCOME_NOTE_BODY;
+            saveData();
+          }
+          return;
+        } catch (err) {
+          // Never let a bad read lead to overwriting good data with an empty database.
+          console.error('Saved data could not be read:', err);
+          try { localStorage.setItem(`${STORAGE_KEY}_corrupt_${Date.now()}`, raw); } catch (e) { /* best effort */ }
+          showToast('Saved data was unreadable. A raw copy was kept in browser storage.', 'error');
+        }
+      }
+
+      cleanupExpiredTrash();
+      state.folders = [{ id: 'f-welcome', name: 'Getting Started' }];
+      state.notes = [{
+        id: 'n-welcome',
+        folderId: 'f-welcome',
+        title: 'Welcome to Notes',
+        body: WELCOME_NOTE_BODY,
+        updatedAt: Date.now(),
+      }];
+      cleanupExpiredTrash();
+      saveData();
+    }
+
+    function ensureTrashFolder() {
+      if (!state.folders.some((folder) => folder.id === TRASH_FOLDER_ID)) {
+        state.folders.push({ id: TRASH_FOLDER_ID, name: 'Trash' });
+      }
+    }
+
+    function saveData() {
+      try {
+        cleanupExpiredTrash();
+        const payload = JSON.stringify({ folders: state.folders, notes: state.notes });
+        localStorage.setItem(STORAGE_KEY, payload);
+        localStorage.setItem(`${STORAGE_KEY}_backup`, payload);
+        if (window.crypto && window.crypto.subtle) {
+          signData(payload)
+            .then((signature) => localStorage.setItem(`${STORAGE_KEY}${STORAGE_HMAC_SUFFIX}`, signature))
+            .catch((err) => console.warn('Could not update storage signature:', err));
+        }
+        return true;
+      } catch (err) {
+        console.error('Failed to save:', err);
+        showToast('Could not save: browser storage is full or unavailable', 'error');
+        return false;
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Selectors (pure: they never change state)
+     * ------------------------------------------------------------------ */
+    function getFilteredNotes() {
+      const q = fold(state.searchQuery);
+      return state.notes
+        .filter((note) => {
+          if (note.folderId === TRASH_FOLDER_ID) return state.activeFilter === 'trash';
+          let inView = true;
+          if (state.activeFilter === 'trash') inView = false;
+          if (state.activeFilter === 'uncategorized') inView = !note.folderId;
+          else if (state.activeFilter !== 'all') inView = note.folderId === state.activeFilter;
+          if (!inView) return false;
+          if (!q) return true;
+          return fold(note.title).includes(q) || fold(note.body).includes(q);
+        })
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+
+    function viewTitle() {
+      if (state.activeFilter === 'all') return 'All Notes';
+      if (state.activeFilter === 'uncategorized') return 'Uncategorized';
+      if (state.activeFilter === 'trash') return 'Trash';
+      const folder = getFolder(state.activeFilter);
+      return folder ? folder.name : 'Folder';
+    }
+
+    // Called explicitly after navigation-type changes (filter, search, delete, import).
+    // It is deliberately NOT called from render functions.
+    function ensureActiveNote() {
+      const visible = getFilteredNotes();
+      if (!visible.some((n) => n.id === state.activeNoteId)) {
+        state.activeNoteId = visible.length ? visible[0].id : null;
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Rendering
+     * ------------------------------------------------------------------ */
+    function renderApp(reloadEditor = false) {
+      if (reloadEditor) editingId = null;   // forces the editor to reload from state
+      renderFolderList();
+      renderFolderSelectOptions();          // options first, then the value is set
+      renderNoteList();
+      renderActiveNote();
+      updateCounts();
+      icons();
+    }
+
+    function renderLists() {
+      renderFolderList();
+      renderNoteList();
+      updateCounts();
+      icons($('sidebar'));
+      icons($('notes-panel'));
+    }
+
+    function updateCounts() {
+      const uncategorized = state.notes.reduce((count, note) => count + (note.folderId ? 0 : 1), 0);
+      const trashed = state.notes.reduce((count, note) => count + (note.folderId === TRASH_FOLDER_ID ? 1 : 0), 0);
+      const activeCount = state.notes.reduce((count, note) => count + (note.folderId === TRASH_FOLDER_ID ? 0 : 1), 0);
+      $('count-all').textContent = activeCount;
+      $('count-uncategorized').textContent = uncategorized;
+      $('count-trash').textContent = trashed;
+    }
+
+    function renderFolderList() {
+      const folderCounts = new Map();
+      state.notes.forEach((note) => {
+        if (!note.folderId || note.folderId === TRASH_FOLDER_ID) return;
+        folderCounts.set(note.folderId, (folderCounts.get(note.folderId) || 0) + 1);
+      });
+
+      const renderBranch = (parentId = null, depth = 0) => {
+        const children = state.folders
+          .filter((folder) => folder.parentId === parentId)
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        if (!children.length) return '';
+
+        return children.map((folder) => {
+          const count = folderCounts.get(folder.id) || 0;
+          const active = state.activeFilter === folder.id;
+          const name = esc(folder.name);
+          const nested = renderBranch(folder.id, depth + 1);
+          return `
+            <div class="space-y-0.5">
+              <div data-folder-id="${esc(folder.id)}" draggable="true" class="folder-item flex items-center justify-between rounded-lg text-sm font-medium transition-colors ${active ? ACTIVE_CLS : IDLE_CLS}">
+                <button type="button" data-action="select" class="flex-1 min-w-0 flex items-center space-x-2.5 px-2.5 py-1.5 text-left">
+                  <i data-lucide="folder" class="w-4 h-4 flex-shrink-0"></i>
+                  <span class="truncate">${name}</span>
+                </button>
+                <span class="folder-count ${BADGE_CLS} mr-1.5">${count}</span>
+                <div class="folder-actions space-x-0.5 pr-1.5">
+                  <button type="button" data-action="add-subfolder" aria-label="Create subfolder in ${name}" title="Create subfolder" class="p-1.5 hover:text-brand-500 rounded">
+                    <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" data-action="move" aria-label="Move folder ${name}" title="Move folder" class="p-1.5 hover:text-brand-500 rounded">
+                    <i data-lucide="arrow-right-left" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" data-action="rename" aria-label="Rename folder ${name}" title="Rename folder" class="p-1.5 hover:text-brand-500 rounded">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" data-action="delete" aria-label="Delete folder ${name}" title="Delete folder" class="p-1.5 hover:text-red-500 rounded">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+              ${nested ? `<div class="folder-branch space-y-0.5">${nested}</div>` : ''}
+            </div>`;
+        }).join('');
+      };
+
+      const rootFolders = renderBranch();
+      $('folders-container').innerHTML = rootFolders || '<div class="px-2 py-2 text-[11px] text-gray-400">No folders yet</div>';
+
+      document.querySelectorAll('.nav-item').forEach((btn) => {
+        const active = btn.dataset.filter === state.activeFilter;
+        btn.className = NAV_BASE + (active ? ACTIVE_CLS : IDLE_CLS);
+      });
+    }
+
+    function renderNoteList() {
+      const container = $('notes-list');
+      const notes = getFilteredNotes();
+
+      $('current-view-title').textContent = viewTitle();
+      $('notes-count-badge').textContent = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`;
+
+      if (!notes.length) {
+        container.innerHTML = `<div class="p-8 text-center text-gray-400 text-xs">${
+          state.searchQuery ? 'No notes match your search.' : 'No notes here yet. Tap New Note to add one.'
+        }</div>`;
+        return;
+      }
+
+      container.innerHTML = notes.map((note) => {
+        const active = note.id === state.activeNoteId;
+        const date = new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const snippet = note.body.replace(/[#*`_\[\]]/g, '').replace(/\s+/g, ' ').trim().slice(0, 65) || 'Empty note';
+        return `
+          <div role="button" tabindex="0" data-note-id="${esc(note.id)}" class="note-item p-3.5 cursor-pointer transition-colors border-l-4 ${
+            active ? 'active-note bg-brand-50/80 dark:bg-brand-500/10 border-brand-500 shadow-sm' : 'border-transparent hover:bg-white/70 dark:hover:bg-gray-800/40'
+          }">
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 truncate pr-2">${esc(note.title || 'Untitled Note')}</h4>
+              <span class="text-[10px] text-gray-400 flex-shrink-0">${esc(date)}</span>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">${esc(snippet)}</p>
+          </div>`;
+      }).join('');
+    }
+
+    function renderFolderSelectOptions() {
+      const select = $('note-folder-select');
+      const previous = select.value;
+      select.innerHTML = '';
+      const none = document.createElement('option');
+      none.value = '';
+      none.textContent = 'Uncategorized';
+      select.appendChild(none);
+      state.folders.filter((f) => f.id !== TRASH_FOLDER_ID).forEach((f) => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+      });
+      select.value = getFolder(previous) ? previous : '';
+    }
+
+    function setDirty(value) {
+      editorState.dirty = value;
+      $('dirty-dot').classList.toggle('hidden', !editorState.dirty);
+      updateLastSavedLabel();
+    }
+
+    function getLastSavedTimestamp() {
+      const stamp = editorState.lastSavedAt ?? lastSavedAt;
+      return typeof stamp === 'number' ? stamp : null;
+    }
+
+    function updateLastSavedLabel() {
+      const el = $('last-saved');
+      if (!el) return;
+      if (!editingId) {
+        el.textContent = '';
+        el.dataset.state = 'saved';
+        el.classList.add('hidden');
+        return;
+      }
+      if (editorState.isSaving) {
+        el.textContent = 'Saving…';
+        el.dataset.state = 'saving';
+        el.classList.toggle('hidden', false);
+        return;
+      }
+      const savedAt = getLastSavedTimestamp();
+      if (!savedAt) {
+        el.textContent = 'Not saved yet';
+        el.dataset.state = 'unsaved';
+        el.classList.toggle('hidden', false);
+        return;
+      }
+      const d = new Date(savedAt);
+      const time = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      el.textContent = editorState.dirty ? 'Unsaved' : `Saved ${time}`;
+      el.dataset.state = editorState.dirty ? 'unsaved' : 'saved';
+      el.classList.toggle('hidden', false);
+    }
+
+    function getEditorDraft() {
+      const note = getNote(editingId);
+      const selected = $('note-folder-select').value;
+      const folderId = note && note.folderId === TRASH_FOLDER_ID ? TRASH_FOLDER_ID : (getFolder(selected) ? selected : null);
+      return {
+        title: $('note-title-input').value.trim().slice(0, MAX_TITLE),
+        body: $('note-body-input').value,
+        folderId,
+      };
+    }
+
+    function snapshotNote(note) {
+      return {
+        title: note.title,
+        body: note.body,
+        folderId: note.folderId,
+        updatedAt: note.updatedAt,
+      };
+    }
+
+    const autosaveNote = debounce(() => {
+      if (!editorState.dirty || !editingId || editorState.isSaving) return;
+      saveActiveNote();
+    }, AUTOSAVE_DELAY_MS);
+
+    // Loads the active note into the editor only when it differs from what is already loaded,
+    // so re-rendering never clobbers text the person is typing.
+    function renderActiveNote() {
+      const note = getNote(state.activeNoteId);
+      const wrapper = $('editor-wrapper');
+      const empty = $('empty-state');
+      const restoreButton = $('btn-restore-note');
+
+      if (!note) {
+        editingId = null;
+        editorState.lastSavedAt = null;
+        lastSavedAt = null;
+        setDirty(false);
+        if (restoreButton) restoreButton.classList.add('hidden');
+        wrapper.classList.add('hidden');
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+        return;
+      }
+
+      const isInTrash = note.folderId === TRASH_FOLDER_ID;
+      if (restoreButton) restoreButton.classList.toggle('hidden', !isInTrash);
+
+      wrapper.classList.remove('hidden');
+      empty.classList.add('hidden');
+      empty.classList.remove('flex');
+
+      if (editingId !== note.id) {
+        $('note-title-input').value = note.title;
+        $('note-body-input').value = note.body;
+        $('note-folder-select').value = getFolder(note.folderId) ? note.folderId : '';
+        editingId = note.id;
+        editorState.lastSavedAt = note.updatedAt;
+        lastSavedAt = note.updatedAt;
+        setDirty(false);
+      }
+
+      if (isInTrash) {
+        $('note-folder-select').value = '';
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Saving
+     * ------------------------------------------------------------------ */
+    // Writes the editor contents to the note that is loaded in the editor (editingId).
+    // Returns false only if persisting failed.
+    function saveActiveNote({ explicit = false } = {}) {
+      const note = getNote(editingId);
+      if (!note) return true;
+
+      const draft = getEditorDraft();
+      editorState.isSaving = true;
+      updateLastSavedLabel();
+
+      // Soft body size guard
+      const bodyBytes = new TextEncoder().encode(draft.body).length;
+      if (bodyBytes > MAX_BODY_BYTES) {
+        editorState.isSaving = false;
+        updateLastSavedLabel();
+        showToast(`Note is too large (${Math.round(bodyBytes / 1024)} KB). Trim it under ~2 MB.`, 'error');
+        return false;
+      }
+
+      const changed = draft.title !== note.title || draft.body !== note.body || draft.folderId !== note.folderId;
+      if (changed) {
+        const before = snapshotNote(note);
+        Object.assign(note, { ...draft, updatedAt: Date.now() });
+        if (!saveData()) {
+          Object.assign(note, before);   // keep memory in sync with storage; the editor still holds the text
+          editorState.isSaving = false;
+          updateLastSavedLabel();
+          return false;
+        }
+        editorState.lastSavedAt = note.updatedAt;
+        lastSavedAt = note.updatedAt;
+        renderLists();
+      }
+      editorState.isSaving = false;
+      setDirty(false);
+      if (explicit) showToast('Note saved', 'success');
+      return true;
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Note actions
+     * ------------------------------------------------------------------ */
+    function selectNote(id) {
+      if (id === state.activeNoteId && id === editingId) {
+        openMobileEditor();
+        return;
+      }
+      saveActiveNote();
+      state.activeNoteId = id;
+      renderNoteList();
+      renderActiveNote();
+      openMobileEditor();
+    }
+
+    function setFilter(filter) {
+      saveActiveNote();
+      state.activeFilter = filter;
+      ensureActiveNote();
+      renderApp();
+      closeMobileSidebar();
+    }
+
+    function createNewNote() {
+      if (state.activeFilter === 'trash') state.activeFilter = 'all';
+      saveActiveNote();
+      if (state.searchQuery) {           // a blank note would never match the search
+        state.searchQuery = '';
+        $('search-input').value = '';
+      }
+      const note = {
+        id: generateId(),
+        folderId: getFolder(state.activeFilter) ? state.activeFilter : null,
+        title: '',
+        body: '',
+        updatedAt: Date.now(),
+      };
+      state.notes.unshift(note);
+      state.activeNoteId = note.id;
+      saveData();
+      renderApp();
+      openMobileEditor();
+      setTimeout(() => $('note-title-input').focus(), 100);
+    }
+
+    // Folder dropdown: move the note. Only change the active filter when the note
+    // would otherwise disappear from the current view.
+    function moveActiveNote() {
+      if (!editingId) return;
+      if (!saveActiveNote()) return;
+      const note = getNote(editingId);
+      if (!note) return;
+
+      if (note.folderId === TRASH_FOLDER_ID) {
+        note.folderId = null;
+        delete note.deletedAt;
+        note.updatedAt = Date.now();
+        saveData();
+        state.activeFilter = 'all';
+        renderApp(true);
+        showToast('Note restored to Uncategorized', 'success');
+        return;
+      }
+
+      const wouldDisappear =
+        (state.activeFilter === 'uncategorized' && note.folderId) ||
+        (state.activeFilter !== 'all' && state.activeFilter !== 'uncategorized' && note.folderId !== state.activeFilter);
+
+      if (wouldDisappear) {
+        state.activeFilter = note.folderId || 'uncategorized';
+      }
+      renderLists();
+      const folder = getFolder(note.folderId);
+      showToast(folder ? `Moved to ${folder.name}` : 'Moved to Uncategorized', 'success');
+    }
+
+    function deleteActiveNote() {
+      const note = getNote(editingId);
+      if (!note) return;
+      const id = note.id;
+      const isTrashed = note.folderId === TRASH_FOLDER_ID;
+      confirmDialog({
+        title: isTrashed ? 'Delete note permanently' : 'Move note to Trash',
+        message: isTrashed
+          ? `Permanently delete "${note.title || 'Untitled Note'}"? This can't be undone.`
+          : `Move "${note.title || 'Untitled Note'}" to Trash? It will be deleted automatically after 30 days.`,
+        onConfirm: () => {
+          if (isTrashed) {
+            state.notes = state.notes.filter((n) => n.id !== id);
+          } else {
+            note.folderId = TRASH_FOLDER_ID;
+            note.deletedAt = Date.now();
+            note.updatedAt = Date.now();
+          }
+          if (state.activeNoteId === id) state.activeNoteId = null;
+          saveData();
+          ensureActiveNote();
+          renderApp(true);
+          closeMobileEditor();
+          showToast(isTrashed ? 'Note permanently deleted' : 'Note moved to Trash', 'info');
+        },
+      });
+    }
+
+    function restoreActiveNote() {
+      const note = getNote(editingId);
+      if (!note || note.folderId !== TRASH_FOLDER_ID) return;
+      note.folderId = null;
+      delete note.deletedAt;
+      note.updatedAt = Date.now();
+      state.activeFilter = 'all';
+      saveData();
+      renderApp(true);
+      showToast('Note restored to Uncategorized', 'success');
+    }
+
+    function copyNoteContent() {
+      if (!editingId) return;
+      const text = $('note-body-input').value;
+      if (!navigator.clipboard || !window.isSecureContext) {
+        showToast('Clipboard access is unavailable in this browser.', 'error');
+        return;
+      }
+      navigator.clipboard.writeText(text)
+        .then(() => showToast('Copied to clipboard', 'success'))
+        .catch(() => showToast('Could not copy to the clipboard.', 'error'));
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Folder actions
+     * ------------------------------------------------------------------ */
+    function promptCreateFolder() {
+      promptDialog({
+        title: 'Create folder',
+        placeholder: 'Folder name',
+        confirmLabel: 'Create',
+        onSubmit: (name) => {
+          saveActiveNote();
+          const folder = { id: generateId(), name: name.slice(0, MAX_FOLDER_NAME), parentId: null };
+          state.folders.push(folder);
+          state.activeFilter = folder.id;
+          saveData();
+          ensureActiveNote();
+          renderApp();
+          showToast('Folder created', 'success');
+        },
+      });
+    }
+
+    function promptCreateSubFolder(parentFolderId) {
+      const parentFolder = getFolder(parentFolderId);
+      if (!parentFolder) return;
+      promptDialog({
+        title: `Create subfolder in ${parentFolder.name}`,
+        placeholder: 'Subfolder name',
+        confirmLabel: 'Create',
+        onSubmit: (name) => {
+          saveActiveNote();
+          const folder = { id: generateId(), name: name.slice(0, MAX_FOLDER_NAME), parentId: parentFolderId };
+          state.folders.push(folder);
+          state.activeFilter = folder.id;
+          saveData();
+          ensureActiveNote();
+          renderApp();
+          showToast('Subfolder created', 'success');
+        },
+      });
+    }
+
+    function promptMoveFolder(folderId) {
+      const folder = getFolder(folderId);
+      if (!folder) return;
+      const forbiddenIds = new Set(collectDescendantFolderIds(folderId));
+      forbiddenIds.add(folderId);
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">Move folder</h3>
+        <label for="move-folder-target" class="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1">Parent folder</label>
+        <select id="move-folder-target" class="${INPUT_CLS} mb-4">
+          <option value="">Top level</option>
+          ${state.folders
+            .filter((candidate) => candidate.id !== folderId && !forbiddenIds.has(candidate.id) && candidate.id !== TRASH_FOLDER_ID)
+            .map((candidate) => `<option value="${esc(candidate.id)}" ${candidate.id === folder.parentId ? 'selected' : ''}>${esc(candidate.name)}</option>`)
+            .join('')}
+        </select>
+        <div class="flex justify-end space-x-2">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+          <button type="button" id="modal-confirm" class="${BTN_PRIMARY}">Move folder</button>
+        </div>`);
+
+      const select = $('move-folder-target');
+      const submit = () => {
+        const nextParentId = select.value || null;
+        if (nextParentId === folderId) {
+          closeModal();
+          return showToast('A folder cannot be moved into itself.', 'error');
+        }
+        if (nextParentId && collectDescendantFolderIds(folderId).has(nextParentId)) {
+          closeModal();
+          return showToast('A folder cannot be moved into one of its own children.', 'error');
+        }
+        folder.parentId = nextParentId;
+        saveData();
+        renderApp();
+        closeModal();
+        showToast('Folder moved', 'success');
+      };
+
+      $('modal-confirm').addEventListener('click', submit);
+      select.focus();
+    }
+
+    function moveFolderToParent(folderId, parentId) {
+      const folder = getFolder(folderId);
+      if (!folder) return false;
+      if (parentId === folderId || (parentId && collectDescendantFolderIds(folderId).has(parentId))) {
+        showToast('A folder cannot be moved into itself or one of its children.', 'error');
+        return false;
+      }
+      if (parentId && !getFolder(parentId)) return false;
+      if (folder.parentId === parentId) return false;
+      folder.parentId = parentId || null;
+      saveData();
+      renderApp();
+      showToast(parentId ? `Moved into ${getFolder(parentId).name}` : 'Moved to top level', 'success');
+      return true;
+    }
+
+    function promptRenameFolder(folderId) {
+      const folder = getFolder(folderId);
+      if (!folder) return;
+      promptDialog({
+        title: 'Rename folder',
+        value: folder.name,
+        confirmLabel: 'Save',
+        onSubmit: (name) => {
+          folder.name = name.slice(0, MAX_FOLDER_NAME);
+          saveData();
+          renderApp();
+          showToast('Folder renamed', 'success');
+        },
+      });
+    }
+
+    function confirmDeleteFolder(folderId) {
+      const folder = getFolder(folderId);
+      if (!folder) return;
+      const descendants = collectDescendantFolderIds(folderId);
+      confirmDialog({
+        title: 'Delete folder',
+        message: `Move "${folder.name}" and its subfolders to Trash? Notes will remain for 30 days before being permanently deleted.`,
+        onConfirm: () => {
+          saveActiveNote();
+          const foldersToRemove = new Set([folderId, ...descendants]);
+          state.folders = state.folders.filter((f) => !foldersToRemove.has(f.id));
+          state.notes.forEach((n) => {
+            if (foldersToRemove.has(n.folderId)) {
+              n.folderId = TRASH_FOLDER_ID;
+              n.deletedAt = Date.now();
+              n.updatedAt = Date.now();
+            }
+          });
+          if (state.activeFilter === folderId) state.activeFilter = 'all';
+          saveData();
+          ensureActiveNote();
+          renderApp(true);
+          showToast('Folder moved to Trash', 'info');
+        },
+      });
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Modals (with basic focus trap)
+     * ------------------------------------------------------------------ */
+    function openModal(html) {
+      lastFocused = document.activeElement;
+      const backdrop = $('modal-backdrop');
+      $('modal-content').innerHTML = html;
+      backdrop.classList.remove('hidden');
+      backdrop.setAttribute('aria-hidden', 'false');
+      icons($('modal-card'));
+
+      // Simple focus trap: keep focus inside the dialog
+      const focusable = $('modal-card').querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const trap = (e) => {
+          if (e.key !== 'Tab') return;
+          if (e.shiftKey) {
+            if (document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        };
+        backdrop._trapHandler = trap;
+        document.addEventListener('keydown', trap);
+      }
+    }
+
+    function closeModal() {
+      const backdrop = $('modal-backdrop');
+      if (backdrop._trapHandler) {
+        document.removeEventListener('keydown', backdrop._trapHandler);
+        delete backdrop._trapHandler;
+      }
+      backdrop.classList.add('hidden');
+      backdrop.setAttribute('aria-hidden', 'true');
+      $('modal-content').innerHTML = '';
+      const el = lastFocused;
+      lastFocused = null;
+      // Don't hand focus back to a text field: on phones that pops the keyboard open.
+      if (el && document.contains(el) && !/^(INPUT|TEXTAREA)$/.test(el.tagName)) el.focus();
+    }
+
+    const isModalOpen = () => !$('modal-backdrop').classList.contains('hidden');
+
+    function confirmDialog({ title, message, confirmLabel = 'Delete', onConfirm }) {
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">${esc(title)}</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">${esc(message)}</p>
+        <div class="flex justify-end space-x-2">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+          <button type="button" id="modal-confirm" class="${BTN_DANGER}">${esc(confirmLabel)}</button>
+        </div>`);
+      const btn = $('modal-confirm');
+      btn.addEventListener('click', () => { closeModal(); onConfirm(); });
+      btn.focus();
+    }
+
+    function promptDialog({ title, value = '', placeholder = '', confirmLabel = 'Save', onSubmit }) {
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">${esc(title)}</h3>
+        <input type="text" id="modal-input" maxlength="${MAX_FOLDER_NAME}" value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off" class="${INPUT_CLS} mb-4">
+        <div class="flex justify-end space-x-2">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+          <button type="button" id="modal-confirm" class="${BTN_PRIMARY}">${esc(confirmLabel)}</button>
+        </div>`);
+      const input = $('modal-input');
+      const submit = () => {
+        const v = input.value.trim();
+        if (!v) { input.focus(); return; }
+        closeModal();
+        onSubmit(v);
+      };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+      $('modal-confirm').addEventListener('click', submit);
+      input.focus();
+      input.select();
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Export / import
+     * ------------------------------------------------------------------ */
+    function downloadFile(filename, text) {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);   // revoking immediately can cancel the download
+    }
+
+    function openExportModal() {
+      saveActiveNote();
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Export backup</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Download your notes and folders as a JSON file.</p>
+
+        <label class="flex items-center space-x-2 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer mb-4">
+          <input type="checkbox" id="chk-encrypt-export" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+          <span>Encrypt with a passphrase</span>
+        </label>
+
+        <div id="export-password-section" class="hidden space-y-3 mb-4">
+          <div>
+            <label for="export-passphrase" class="block text-[11px] font-medium text-gray-500 mb-1">Passphrase (12+ chars; 3 of 4 character classes)</label>
+            <input type="password" id="export-passphrase" autocomplete="new-password" class="${INPUT_CLS}">
+            <div class="mt-2">
+              <div class="flex items-center justify-between mb-1 text-[10px] text-gray-500">
+                <span>Strength</span>
+                <span id="export-passphrase-strength">None</span>
+              </div>
+              <div class="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div id="export-passphrase-meter" class="h-full w-0 rounded-full bg-red-500 transition-all duration-200" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="export-passphrase-confirm" class="block text-[11px] font-medium text-gray-500 mb-1">Confirm passphrase</label>
+            <input type="password" id="export-passphrase-confirm" autocomplete="new-password" class="${INPUT_CLS}">
+          </div>
+          <p class="text-[11px] text-gray-500">If you forget this passphrase, the backup can't be recovered.</p>
+        </div>
+
+        <div class="flex justify-end space-x-2">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+          <button type="button" id="btn-process-export" class="${BTN_PRIMARY}">Download backup</button>
+        </div>`);
+
+      const chk = $('chk-encrypt-export');
+      const passphraseInput = $('export-passphrase');
+      const meter = $('export-passphrase-meter');
+      const strengthText = $('export-passphrase-strength');
+
+      const updatePassphraseStrength = () => {
+        const score = scorePassphrase(passphraseInput.value);
+        const percent = Math.min((score / 4) * 100, 100);
+        let label = 'None';
+        let color = 'bg-red-500';
+        if (score >= 3) { label = 'Strong'; color = 'bg-emerald-500'; }
+        else if (score >= 2) { label = 'Moderate'; color = 'bg-amber-500'; }
+        else if (score >= 1) { label = 'Weak'; color = 'bg-orange-500'; }
+        meter.style.width = `${percent}%`;
+        meter.className = `h-full rounded-full transition-all duration-200 ${color}`;
+        strengthText.textContent = label;
+      };
+
+      chk.addEventListener('change', () => {
+        $('export-password-section').classList.toggle('hidden', !chk.checked);
+        if (chk.checked) passphraseInput.focus();
+      });
+      passphraseInput.addEventListener('input', updatePassphraseStrength);
+
+      const btn = $('btn-process-export');
+      btn.addEventListener('click', async () => {
+        saveActiveNote();
+        const date = new Date().toISOString().slice(0, 10); // UTC date
+        const raw = JSON.stringify({
+          version: '2.0',
+          exportedAt: new Date().toISOString(),
+          folders: state.folders,
+          notes: state.notes,
+        }, null, 2);
+
+        let payload = raw;
+        let filename = `notes-backup-${date}.json`;
+
+        if (chk.checked) {
+          const pass = $('export-passphrase').value;
+          if (!isStrongPassphrase(pass)) {
+            return showToast('Use a passphrase with 12+ characters and at least 3 character classes', 'error');
+          }
+          if (pass !== $('export-passphrase-confirm').value) return showToast('Passphrases do not match', 'error');
+
+          btn.disabled = true;
+          btn.textContent = 'Encrypting…';
+          try {
+            payload = await encryptData(raw, pass);
+            filename = `notes-backup-encrypted-${date}.enc.json`;
+          } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'Download backup';
+            return showToast(err.message || 'Encryption failed', 'error');
+          }
+        }
+
+        downloadFile(filename, payload);
+        closeModal();
+        showToast('Backup exported', 'success');
+      });
+    }
+
+    function handleImportFileSelect(e) {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      if (file.size > MAX_IMPORT_BYTES) return showToast('File too large to import (max 10 MB)', 'error');
+
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Could not read that file', 'error');
+      reader.onload = () => {
+        let parsed;
+        try {
+          parsed = JSON.parse(reader.result);
+        } catch (err) {
+          return showToast('That is not a valid JSON file', 'error');
+        }
+        if (parsed && parsed.encrypted === true && typeof parsed.ciphertext === 'string') {
+          return promptImportDecrypt(parsed);
+        }
+        try {
+          promptImportMergeOptions(sanitizeData(parsed));
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function promptImportDecrypt(payload) {
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Encrypted backup</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Enter the passphrase used when this backup was exported.</p>
+        <input type="password" id="import-passphrase" placeholder="Passphrase" autocomplete="current-password" class="${INPUT_CLS} mb-4">
+        <div class="flex justify-end space-x-2">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+          <button type="button" id="btn-decrypt-import" class="${BTN_PRIMARY}">Decrypt and continue</button>
+        </div>`);
+
+      const input = $('import-passphrase');
+      const btn = $('btn-decrypt-import');
+      input.focus();
+
+      const run = async () => {
+        if (!input.value) return showToast('Enter the passphrase', 'error');
+        btn.disabled = true;
+        btn.textContent = 'Decrypting…';
+        let plain;
+        try {
+          plain = await decryptData(payload, input.value);
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = 'Decrypt and continue';
+          return showToast(err.message, 'error');
+        }
+        try {
+          // Close the decrypt modal first so the merge options modal can open cleanly
+          closeModal();
+          promptImportMergeOptions(sanitizeData(JSON.parse(plain)));
+        } catch (err) {
+          // Modal already closed; just notify
+          showToast('The backup contents are invalid', 'error');
+        }
+      };
+      btn.addEventListener('click', run);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(); } });
+    }
+
+    function promptImportMergeOptions(data) {
+      const n = data.notes.length;
+      const f = data.folders.length;
+      openModal(`
+        <h3 id="modal-title" class="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Import backup</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">This file has <strong>${n} ${n === 1 ? 'note' : 'notes'}</strong> in <strong>${f} ${f === 1 ? 'folder' : 'folders'}</strong>. Export a backup first if you want a safety net.</p>
+        <div class="space-y-2 mb-5">
+          <button type="button" id="btn-import-merge" class="w-full text-left p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-brand-500 transition-colors">
+            <div class="font-semibold text-xs text-gray-800 dark:text-gray-200">Merge with existing notes</div>
+            <div class="text-[11px] text-gray-500">Adds new notes and keeps the newer copy of any note that exists in both. Safe to run twice.</div>
+          </button>
+          <button type="button" id="btn-import-replace" class="w-full text-left p-2.5 rounded-lg border border-red-200 dark:border-red-900/50 hover:border-red-500 bg-red-50/50 dark:bg-red-950/20 transition-colors">
+            <div class="font-semibold text-xs text-red-600 dark:text-red-400">Replace everything</div>
+            <div class="text-[11px] text-gray-500 dark:text-gray-400">Deletes all current notes and folders, then loads this file.</div>
+          </button>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" data-modal-close class="${BTN_GHOST}">Cancel</button>
+        </div>`);
+
+      $('btn-import-merge').addEventListener('click', () => { if (applyImport('merge', data)) closeModal(); });
+      $('btn-import-replace').addEventListener('click', () => { if (applyImport('replace', data)) closeModal(); });
+    }
+
+    // Builds the new dataset without mutating current arrays, so a failed save can be rolled back.
+    function applyImport(mode, data) {
+      saveActiveNote();
+      const previous = { folders: state.folders, notes: state.notes };
+      let next;
+      let added = 0;
+      let updated = 0;
+
+      if (mode === 'replace') {
+        next = { folders: data.folders, notes: data.notes };
+      } else {
+        const folderMap = new Map(state.folders.map((f) => [f.id, f]));
+        data.folders.forEach((f) => { if (!folderMap.has(f.id)) folderMap.set(f.id, { ...f }); });
+
+        const noteMap = new Map(state.notes.map((n) => [n.id, n]));
+        data.notes.forEach((n) => {
+          const existing = noteMap.get(n.id);
+          if (!existing) { noteMap.set(n.id, { ...n }); added++; }
+          else if (n.updatedAt > existing.updatedAt) { noteMap.set(n.id, { ...n }); updated++; }
+        });
+        next = { folders: [...folderMap.values()], notes: [...noteMap.values()] };
+      }
+
+      const clean = sanitizeData(next);
+      state.folders = clean.folders;
+      state.notes = clean.notes;
+      if (!saveData()) {
+        state.folders = previous.folders;
+        state.notes = previous.notes;
+        return false;
+      }
+
+      if (mode === 'replace') {
+        state.activeFilter = 'all';
+        state.activeNoteId = null;
+      } else if (!isValidFilter(state.activeFilter)) {
+        state.activeFilter = 'all';
+      }
+      ensureActiveNote();
+      renderApp(true);
+      showToast(mode === 'replace' ? 'Backup restored' : `Merged: ${added} added, ${updated} updated`, 'success');
+      return true;
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Mobile navigation
+     * ------------------------------------------------------------------ */
+    const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
+
+    function openMobileSidebar() {
+      $('sidebar').classList.remove('-translate-x-full');
+      $('mobile-overlay').classList.remove('hidden');
+    }
+    function closeMobileSidebar() {
+      $('sidebar').classList.add('-translate-x-full');
+      $('mobile-overlay').classList.add('hidden');
+    }
+    function openMobileEditor() {
+      if (isMobile()) $('editor-panel').classList.remove('translate-x-full');
+    }
+    function closeMobileEditor() {
+      if (isMobile()) $('editor-panel').classList.add('translate-x-full');
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Events
+     * ------------------------------------------------------------------ */
+    function bindEvents() {
+      // Notes list (delegated)
+      const list = $('notes-list');
+      list.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-note-id]');
+        if (item) selectNote(item.dataset.noteId);
+      });
+      list.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const item = e.target.closest('[data-note-id]');
+        if (item) { e.preventDefault(); selectNote(item.dataset.noteId); }
+      });
+
+      // Folders (delegated). IDs come from data attributes, never from inline JS.
+      $('folders-container').addEventListener('click', (e) => {
+        const row = e.target.closest('[data-folder-id]');
+        if (!row) return;
+        const id = row.dataset.folderId;
+        const actionEl = e.target.closest('[data-action]');
+        const action = actionEl ? actionEl.dataset.action : 'select';
+        if (action === 'add-subfolder') promptCreateSubFolder(id);
+        else if (action === 'move') promptMoveFolder(id);
+        else if (action === 'rename') promptRenameFolder(id);
+        else if (action === 'delete') confirmDeleteFolder(id);
+        else setFilter(id);
+      });
+
+      const foldersContainer = $('folders-container');
+      const rootDrop = $('folders-root-drop');
+      foldersContainer.addEventListener('dragstart', (e) => {
+        const row = e.target.closest('[data-folder-id]');
+        if (!row) return;
+        draggedFolderId = row.dataset.folderId;
+        row.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedFolderId);
+      });
+      foldersContainer.addEventListener('dragend', (e) => {
+        const row = e.target.closest('[data-folder-id]');
+        if (row) row.classList.remove('is-dragging');
+        foldersContainer.querySelectorAll('.is-drop-target').forEach((el) => el.classList.remove('is-drop-target'));
+        rootDrop.classList.remove('is-drop-target');
+        draggedFolderId = null;
+      });
+      foldersContainer.addEventListener('dragover', (e) => {
+        const target = e.target.closest('[data-folder-id]');
+        if (!draggedFolderId || !target || target.dataset.folderId === draggedFolderId) return;
+        if (collectDescendantFolderIds(draggedFolderId).has(target.dataset.folderId)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        target.classList.add('is-drop-target');
+      });
+      foldersContainer.addEventListener('dragleave', (e) => {
+        const target = e.target.closest('[data-folder-id]');
+        if (target && !target.contains(e.relatedTarget)) target.classList.remove('is-drop-target');
+      });
+      foldersContainer.addEventListener('drop', (e) => {
+        const target = e.target.closest('[data-folder-id]');
+        if (!draggedFolderId || !target) return;
+        e.preventDefault();
+        moveFolderToParent(draggedFolderId, target.dataset.folderId);
+      });
+      rootDrop.addEventListener('dragover', (e) => {
+        if (!draggedFolderId || getFolder(draggedFolderId)?.parentId == null) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        rootDrop.classList.add('is-drop-target');
+      });
+      rootDrop.addEventListener('dragleave', (e) => {
+        if (!rootDrop.contains(e.relatedTarget)) rootDrop.classList.remove('is-drop-target');
+      });
+      rootDrop.addEventListener('drop', (e) => {
+        if (!draggedFolderId) return;
+        e.preventDefault();
+        rootDrop.classList.remove('is-drop-target');
+        moveFolderToParent(draggedFolderId, null);
+      });
+
+      document.querySelectorAll('.nav-item').forEach((btn) => {
+        btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+      });
+
+      // Modal: one set of handlers for every dialog
+      $('modal-backdrop').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-backdrop' || e.target.closest('[data-modal-close]')) closeModal();
+      });
+
+      // Global keys
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          saveActiveNote({ explicit: true });
+        } else if (e.key === 'Escape') {
+          if (isModalOpen()) closeModal();
+          else closeMobileSidebar();
+        }
+      });
+
+      // beforeunload warning when there are unsaved changes
+      window.addEventListener('beforeunload', (e) => {
+        if (editorState.dirty) {
+          e.preventDefault();
+          e.returnValue = ''; // required for Chrome
+        }
+      });
+
+      // Editor
+      $('note-title-input').addEventListener('input', () => {
+        setDirty(true);
+        autosaveNote();
+      });
+      $('note-body-input').addEventListener('input', () => {
+        setDirty(true);
+        autosaveNote();
+      });
+      $('note-folder-select').addEventListener('change', moveActiveNote);
+      $('btn-restore-note').addEventListener('click', restoreActiveNote);
+      $('btn-copy-note').addEventListener('click', copyNoteContent);
+      $('btn-delete-note').addEventListener('click', deleteActiveNote);
+      $('btn-back-to-list').addEventListener('click', () => {
+        saveActiveNote();
+        closeMobileEditor();
+      });
+
+      // Sidebar actions
+      $('btn-new-note').addEventListener('click', () => { createNewNote(); closeMobileSidebar(); });
+      $('btn-empty-new-note').addEventListener('click', createNewNote);
+      $('btn-add-folder').addEventListener('click', promptCreateFolder);
+      $('btn-export-data').addEventListener('click', openExportModal);
+      $('btn-import-data').addEventListener('click', () => $('file-import-input').click());
+      $('file-import-input').addEventListener('change', handleImportFileSelect);
+
+      // Debounced search
+      const onSearch = debounce((value) => {
+        saveActiveNote();                       // save first, so switching notes can't drop edits
+        state.searchQuery = value.trim();
+        ensureActiveNote();
+        renderNoteList();
+        renderActiveNote();
+      }, 80);
+      $('search-input').addEventListener('input', (e) => onSearch(e.target.value));
+
+      $('open-mobile-sidebar').addEventListener('click', openMobileSidebar);
+      $('close-mobile-sidebar').addEventListener('click', closeMobileSidebar);
+      $('mobile-overlay').addEventListener('click', closeMobileSidebar);
+
+      // Persist pending edits when the page is hidden. On phones, pagehide and
+      // visibilitychange fire far more reliably than beforeunload.
+      window.addEventListener('pagehide', () => saveActiveNote());
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') saveActiveNote();
+      });
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Init
+     * ------------------------------------------------------------------ */
+    function init() {
+      loadData();
+
+      ensureActiveNote();
+      bindEvents();
+      renderApp();
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>
