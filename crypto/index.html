@@ -14,14 +14,18 @@
        3. Add nonce to script tag: <script nonce="{nonce}">
        4. Move inline script to external file for best security -->
   <title>Crypto v1.0.1</title>
-  <meta name="theme-color" content="#f2e8d5" />
+  <meta name="theme-color" content="#121212" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --paper: #f2e8d5;
-      --paper-input: #f9f3e6;
-      --ink: #000000;
+      color-scheme: dark;
+      --paper: #121212;
+      --surface: #1e1e1e;
+      --paper-input: #1e1e1e;
+      --ink: #f0ebe7;
+      --line: #33302d;
+      --accent: #5a9eff;
       --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono", "DejaVu Sans Mono", monospace;
     }
@@ -52,7 +56,7 @@
     .card {
       border: 1px solid var(--ink);
       padding: 24px 20px;
-      background: var(--paper);
+      background: var(--surface);
     }
 
     h1 {
@@ -84,7 +88,7 @@
     }
 
     .help-toggle[aria-expanded="true"] {
-      background: var(--ink);
+      background: var(--accent);
       color: var(--paper);
     }
 
@@ -130,7 +134,7 @@
     .mode-switch button + button { border-left: none; }
 
     .mode-switch button[aria-pressed="true"] {
-      background: var(--ink);
+      background: var(--accent);
       color: var(--paper);
       font-weight: 700;
     }
@@ -172,7 +176,7 @@
     input[type="text"]:focus,
     input[type="password"]:focus,
     textarea:focus {
-      box-shadow: inset 0 0 0 2px var(--ink);
+      box-shadow: inset 0 0 0 2px var(--accent);
     }
 
     textarea {
@@ -184,7 +188,7 @@
     textarea[readonly] { background: var(--paper); }
 
     ::placeholder {
-      color: #5c5346;
+      color: #a8a098;
       opacity: 1;
     }
 
@@ -216,7 +220,7 @@
     }
 
     .icon-btn[aria-pressed="true"] {
-      background: var(--ink);
+      background: var(--accent);
       color: var(--paper);
     }
 
@@ -236,7 +240,7 @@
     .strength-fill {
       height: 100%;
       width: 0;
-      background: var(--ink);
+      background: var(--accent);
     }
 
     .strength-label {
@@ -261,9 +265,9 @@
 
     .btn-primary {
       min-height: 48px;
-      background: var(--ink);
+      background: var(--accent);
       color: var(--paper);
-      border: 1px solid var(--ink);
+      border: 1px solid var(--accent);
       padding: 12px 28px;
       font-size: 16px;
       font-weight: 700;
@@ -273,7 +277,7 @@
 
     .btn-ghost {
       min-height: 48px;
-      background: var(--paper);
+      background: var(--surface);
       border: 1px solid var(--ink);
       color: var(--ink);
       padding: 12px 20px;
@@ -341,6 +345,25 @@
       font-size: 14px;
       margin-top: 10px;
       line-height: 1.5;
+    }
+
+    .card,
+    .help-toggle,
+    .help-panel,
+    .mode-switch button,
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    .icon-btn,
+    .strength-track,
+    .btn-ghost,
+    .notice {
+      border-color: var(--line);
+    }
+
+    .status.error,
+    .status.warn {
+      border-left-color: var(--line);
     }
 
     @media (max-width: 640px) {
