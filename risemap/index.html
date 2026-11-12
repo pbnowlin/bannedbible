@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>RiseMap — Mosques & Hindu Temples in the United States</title>
+<style>
+  :root{
+    --bg:#f7f5f1; --panel:#ffffff; --ink:#1c1a17; --muted:#6b6560; --line:#e3ddd3;
+    --accent:#0f766e;
+    --shadow:0 1px 3px rgba(28,26,23,.08), 0 8px 24px rgba(28,26,23,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#171512; --panel:#221f1b; --ink:#ece7de; --muted:#a89f94; --line:#3a352e; --shadow:0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3); }
+  }
+  *{box-sizing:border-box}
+  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia, "Times New Roman", serif;}
+  a{color:var(--accent)}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 20px 40px}
+  header.top{padding:8px 0 18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .kicker{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  h1{font-size:2.1rem;line-height:1.05;margin:0;font-weight:700;letter-spacing:-.01em}
+  h1 .rise{color:var(--accent)}
+  .lede{font-size:1.02rem;line-height:1.55;color:var(--muted);max-width:62ch;margin:10px 0 0}
+  .toggle-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:18px 0 4px}
+  .toggle{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+  .toggle button{font-family:system-ui,sans-serif;font-size:.95rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:10px 22px;border-radius:999px;cursor:pointer;min-height:44px}
+  .toggle button.active{background:var(--accent);color:#fff}
+  .toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .stat-strip{display:flex;flex-wrap:wrap;gap:10px;font-family:system-ui,sans-serif}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:132px}
+  .stat b{display:block;font-size:1.25rem;line-height:1}
+  .stat span{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+  @media (max-width:960px){ .layout{grid-template-columns:1fr} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px}
+  .card h2{font-size:1.15rem;margin:0 0 4px}
+  .card .sub{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted);margin:0 0 12px;line-height:1.5}
+  /* Tile map */
+  #tileMap{position:relative;width:100%;aspect-ratio:12/7.4}
+  .tile{position:absolute;border:0;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:system-ui,sans-serif;padding:2px;transition:transform .08s}
+  .tile:hover{transform:scale(1.07);z-index:3;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .tile:focus-visible{outline:2px solid var(--ink);outline-offset:1px;z-index:3}
+  .tile.selected{outline:2.5px solid var(--ink);outline-offset:1px;z-index:2}
+  .tile .ab{font-weight:700;font-size:clamp(.55rem,1.5vw,.85rem);line-height:1}
+  .tile .ct{font-size:clamp(.5rem,1.25vw,.72rem);line-height:1;opacity:.85}
+  .legend{display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:.78rem;color:var(--muted);margin-top:12px;flex-wrap:wrap}
+  .legend .bar{flex:1;min-width:140px;height:10px;border-radius:99px;border:1px solid var(--line)}
+  #detail{margin-top:16px}
+  .detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+  @media (max-width:560px){.detail-grid{grid-template-columns:1fr 1fr}}
+  .dbox{border:1px solid var(--line);border-radius:12px;padding:12px}
+  .dbox b{display:block;font-family:system-ui,sans-serif;font-size:1.3rem}
+  .dbox span{font-family:system-ui,sans-serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .note{font-size:.92rem;line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:.88rem}
+  th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr[data-state]{cursor:pointer}
+  tr[data-state]:hover td{background:rgba(127,127,127,.08)}
+  .feed-item{border-top:1px solid var(--line);padding:14px 0}
+  .feed-item:first-of-type{border-top:0}
+  .feed-date{font-family:system-ui,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+  .feed-item h3{font-size:1rem;margin:5px 0 3px;line-height:1.35}
+  .feed-item p{margin:0;font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted);line-height:1.5}
+  .badge{display:inline-block;font-family:system-ui,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+  .method{font-size:.9rem;line-height:1.65;color:var(--muted)}
+  .method strong{color:var(--ink)}
+  footer{margin-top:22px;font-family:system-ui,sans-serif;font-size:.8rem;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="kicker">BannedBible.com / RiseMap</p>
+    <h1><span class="rise">Rise</span>Map</h1>
+    <p class="lede">Where Muslim and Hindu communities are growing across the United States. States are shaded by places of worship <strong>per 100,000 residents</strong> — so smaller states with strong communities stand out, not just the biggest states. Click any state for its numbers.</p>
+    <div class="toggle-row">
+      <div class="toggle" role="tablist" aria-label="Choose view">
+        <button id="btn-mosque" class="active" role="tab" aria-selected="true">🕌 &nbsp;Mosques</button>
+        <button id="btn-temple" role="tab" aria-selected="false">🛕 &nbsp;Hindu Temples</button>
+      </div>
+      <div class="stat-strip" id="statStrip"></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div>
+      <section class="card" aria-label="United States map">
+        <h2 id="mapTitle">Mosques per 100,000 residents</h2>
+        <p class="sub" id="mapSub">Darker = more mosques per capita.</p>
+        <div id="tileMap" role="group" aria-label="Tile map of the United States. Each state is an equal-size tile so small states stay readable; shading shows the per-capita rate."></div>
+        <div class="legend"><span>Fewer per capita</span><div class="bar" id="legendBar"></div><span>More per capita</span><span id="legendMax"></span></div>
+        <p class="sub" style="margin-top:8px">Tile map: every state is drawn as an equal square in its approximate geographic position, so small states like New Jersey and Connecticut — among the highest per capita — stay visible. The number in each tile is the state total.</p>
+        <div id="detail"></div>
+      </section>
+
+      <section class="card" style="margin-top:20px" aria-label="State rankings">
+        <h2 id="tableTitle">All states — mosques</h2>
+        <p class="sub">Sorted by per-capita rate. Click a row to see that state's detail above.</p>
+        <table>
+          <thead><tr><th>State</th><th class="num" id="thCount">Mosques</th><th class="num">Per 100k</th><th class="num">Rank</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </section>
+
+      <section class="card" style="margin-top:20px" aria-label="Methodology and sources">
+        <h2>About these numbers — please read</h2>
+        <div class="method">
+          <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques or Hindu temples in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. RiseMap does not merge sources into one “true” total; each view uses one source consistently so states can be compared fairly.</p>
+          <p><strong>Mosque view:</strong> HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em> dataset, IRS 501(c)(3) snapshot, <strong>July 2024</strong> — <strong>2,058</strong> mosques nationally. Because it is built from IRS nonprofit records, informal or unregistered prayer spaces are not counted.</p>
+          <p><strong>Hindu temple view:</strong> <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> directory — <strong>534</strong> temples nationally (530 across the 50 states + DC; the remainder are in U.S. territories, which are not shown on this map).</p>
+          <p><strong>Per-capita rates</strong> use 2024 U.S. Census Bureau state population estimates: rate = count ÷ population × 100,000. Population is a state's total population, not its Muslim or Hindu population, so the rate shows how present these houses of worship are in the wider community.</p>
+          <p><strong>Names &amp; cities:</strong> the full name-and-city directory for each state is still being imported and verified, so this page shows verified state totals only rather than an incomplete list. You can browse the underlying directories at <a href="https://hifld-geoplatform.hub.arcgis.com/" target="_blank" rel="noopener">HIFLD GeoPlatform</a> (mosques) and <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> (temples).</p>
+        </div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="card" aria-label="Recent openings feed">
+        <h2 id="feedTitle">New mosque openings</h2>
+        <p class="sub">Verified openings and inaugurations. This is a curated list, not a complete national log.</p>
+        <div id="feed"></div>
+      </section>
+      <section class="card" style="margin-top:20px" aria-label="Per capita leaders">
+        <h2>Highest per capita</h2>
+        <p class="sub" id="leadersSub">Mosques per 100,000 residents — top 5</p>
+        <div id="leaders"></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    RiseMap is a reference tool to help people find established Muslim and Hindu communities when relocating, travelling, or researching an area. Figures are a snapshot from the sources and dates named above — check the source directory before relying on a count for a specific place.
+  </footer>
+</div>
+
+<script>
+// ---------- Verified data (do not extend without a source) ----------
+var POP = {AL:5157699,AK:740133,AZ:7582384,AR:3088354,CA:39431263,CO:5957493,CT:3675069,DE:1051917,DC:702250,FL:23372215,GA:11180878,HI:1450254,ID:2029034,IL:12710158,IN:6924274,IA:3241488,KS:2970606,KY:4588372,LA:4597740,ME:1405012,MD:6180253,MA:7136171,MI:10140459,MN:5793151,MS:2938690,MO:6245466,MT:1137233,NE:2034978,NV:3267467,NH:1409032,NJ:9500851,NM:2130256,NY:19500000,NC:11046024,ND:796568,OH:11785935,OK:4095393,OR:4363019,PA:13059322,RI:1112308,SC:5478831,SD:924669,TN:7227750,TX:31290831,UT:3503613,VT:648493,VA:8811091,WA:7958180,WV:1769979,WI:5960975,WY:587618};
+var NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+// Tile positions [col,row] on a 12 x 7 grid, approximate geography
+var POS = {AK:[0,0],ME:[11,0],WA:[1,1],MT:[2,1],ND:[3,1],MN:[4,1],WI:[5,1],MI:[7,1],NY:[9,1],VT:[10,1],NH:[11,1],OR:[1,2],ID:[2,2],SD:[3,2],IA:[4,2],IL:[5,2],IN:[6,2],OH:[7,2],PA:[8,2],NJ:[9,2],CT:[10,2],MA:[11,2],CA:[1,3],NV:[2,3],WY:[3,3],NE:[4,3],MO:[5,3],KY:[6,3],WV:[7,3],VA:[8,3],MD:[9,3],DE:[10,3],RI:[11,3],UT:[2,4],CO:[3,4],KS:[4,4],AR:[5,4],TN:[6,4],NC:[7,4],SC:[8,4],DC:[9,4],AZ:[2,5],NM:[3,5],OK:[4,5],LA:[5,5],MS:[6,5],AL:[7,5],GA:[8,5],HI:[1,6],TX:[4,6],FL:[9,6]};
+
+var DATA = {
+  mosque: {
+    label:"Mosques", singular:"mosque", total:2058, totalNote:"HIFLD, July 2024",
+    counts:{AL:16,AK:1,AZ:31,AR:8,CA:272,CO:24,CT:37,DE:6,DC:5,FL:95,GA:59,HI:0,ID:6,IL:106,IN:33,IA:15,KS:13,KY:18,LA:16,ME:6,MD:55,MA:45,MI:83,MN:53,MS:6,MO:32,MT:1,NE:5,NV:8,NH:4,NJ:103,NM:6,NY:310,NC:51,ND:2,OH:78,OK:12,OR:18,PA:82,RI:6,SC:17,SD:4,TN:23,TX:151,UT:12,VT:2,VA:64,WA:34,WV:6,WI:17,WY:1},
+    colors:["#e6f2ef","#bfe0d8","#8ec7ba","#57a893","#2f8a6e","#0f766e","#0a4f49"],
+    darkTextUntil:2,
+    sourceName:"HIFLD All Places of Worship (IRS 501(c)(3) snapshot, July 2024)",
+    sourceUrl:"https://hifld-geoplatform.hub.arcgis.com/",
+    sourceLinkLabel:"HIFLD GeoPlatform",
+    feed:[
+      {date:"Nov 27, 2026", upcoming:true, name:"Masjid Dar Al-Tawheed", place:"Richardson, Texas", note:"Inauguration scheduled — listed as upcoming."},
+      {date:"June 5–6, 2026", upcoming:false, name:"Imam Al-Hasanain Mosque", place:"Dearborn Heights, Michigan", note:"Grand opening held over two days."},
+      {date:"Feb 7, 2026", upcoming:false, name:"Masjid Istiqlal Houston", place:"Houston, Texas", note:"Inaugurated February 7, 2026."}
+    ]
+  },
+  temple: {
+    label:"Hindu Temples", singular:"temple", total:534, totalNote:"HinduTemples.net; 530 in the 50 states + DC, remainder in territories",
+    counts:{AL:4,AK:1,AZ:10,AR:2,CA:61,CO:4,CT:12,DE:3,DC:0,FL:27,GA:16,HI:3,ID:4,IL:31,IN:8,IA:2,KS:4,KY:4,LA:1,ME:1,MD:12,MA:34,MI:13,MN:4,MS:0,MO:6,MT:0,NE:1,NV:1,NH:1,NJ:39,NM:2,NY:45,NC:8,ND:0,OH:29,OK:2,OR:6,PA:19,RI:2,SC:6,SD:1,TN:3,TX:64,UT:2,VT:0,VA:12,WA:10,WV:3,WI:7,WY:0},
+    colors:["#fdf0e2","#fbd9ae","#f6ba74","#ef9640","#e06f1a","#b45309","#7c2d12"],
+    darkTextUntil:3,
+    sourceName:"HinduTemples.net directory",
+    sourceUrl:"https://hindutemples.net/",
+    sourceLinkLabel:"HinduTemples.net",
+    feed:[
+      {date:"Sep 2, 2026", upcoming:false, name:"ISKCON Cedar Park Temple", place:"Cedar Park, Texas", note:"Opened September 2, 2026."},
+      {date:"May 10, 2026", upcoming:false, name:"BAPS Shri Swaminarayan Mandir", place:"Huntsville, Alabama", note:"Opened May 10, 2026."},
+      {date:"May 2, 2026", upcoming:false, name:"Eastern Iowa Hindu Temple and Cultural Center", place:"Robins, Iowa", note:"Opened May 2, 2026."},
+      {date:"Sep 13, 2025", upcoming:false, name:"BAPS Mandir", place:"Kearns, Utah", note:"Opened September 13, 2025."}
+    ]
+  }
+};
+
+var mode = "mosque";
+var selected = null;
+
+function rowsFor(m){
+  var d = DATA[m];
+  var rows = Object.keys(d.counts).map(function(ab){
+    var c = d.counts[ab];
+    return {ab:ab, name:NAMES[ab], count:c, rate: POP[ab] ? c / POP[ab] * 100000 : 0};
+  });
+  rows.sort(function(a,b){ return b.rate - a.rate || b.count - a.count; });
+  rows.forEach(function(r,i){ r.rank = i+1; });
+  return rows;
+}
+function fmtRate(r){ return r.toFixed(2); }
+function fmtPop(n){ return n.toLocaleString("en-US"); }
+function maxRate(){ var rows = rowsFor(mode); return rows.length ? rows[0].rate : 1; }
+function bucketFor(rate){
+  var max = maxRate();
+  if(rate <= 0) return -1;
+  var b = Math.floor(rate / max * DATA[mode].colors.length);
+  return Math.min(DATA[mode].colors.length - 1, b);
+}
+
+function buildTiles(){
+  var map = document.getElementById("tileMap");
+  map.innerHTML = "";
+  Object.keys(POS).forEach(function(ab){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tile";
+    b.setAttribute("data-ab", ab);
+    b.style.left = (POS[ab][0] / 12 * 100) + "%";
+    b.style.top = (POS[ab][1] / 7.4 * 100) + "%";
+    b.style.width = "calc(" + (100/12) + "% - 4px)";
+    b.style.height = "calc(" + (100/7.4) + "% - 4px)";
+    b.style.margin = "2px";
+    b.innerHTML = '<span class="ab">' + ab + '</span><span class="ct"></span>';
+    b.addEventListener("click", function(){ selectState(ab, false); });
+    map.appendChild(b);
+  });
+}
+function paintTiles(){
+  var d = DATA[mode];
+  var zeroFill = getComputedStyle(document.documentElement).getPropertyValue("--line").trim() || "#e3ddd3";
+  Array.prototype.forEach.call(document.querySelectorAll(".tile"), function(t){
+    var ab = t.getAttribute("data-ab");
+    var c = d.counts[ab] || 0;
+    var rate = POP[ab] ? c / POP[ab] * 100000 : 0;
+    var bk = bucketFor(rate);
+    t.style.background = bk < 0 ? zeroFill : d.colors[bk];
+    t.style.color = (bk < 0 || bk <= d.darkTextUntil) ? "#1c1a17" : "#ffffff";
+    t.querySelector(".ct").textContent = c;
+    t.classList.toggle("selected", ab === selected);
+    t.setAttribute("aria-label", NAMES[ab] + ": " + c + " " + d.singular + (c===1?"":"s") + ", " + fmtRate(rate) + " per 100,000 residents");
+    t.title = NAMES[ab] + " — " + c + " " + d.singular + (c===1?"":"s") + " · " + fmtRate(rate) + " per 100k";
+  });
+  document.getElementById("legendBar").style.background = "linear-gradient(90deg," + d.colors.join(",") + ")";
+  document.getElementById("legendMax").textContent = "Max " + fmtRate(maxRate()) + " per 100k";
+}
+
+function renderStats(){
+  var d = DATA[mode];
+  var rows = rowsFor(mode);
+  var top = rows[0];
+  var withAny = rows.filter(function(r){return r.count>0;}).length;
+  document.getElementById("statStrip").innerHTML =
+    '<div class="stat"><b>' + d.total.toLocaleString("en-US") + '</b><span>' + (mode==="mosque" ? "Mosques nationwide" : "Temples nationwide") + '</span></div>' +
+    '<div class="stat"><b>' + top.name + '</b><span>Highest per capita · ' + fmtRate(top.rate) + '/100k</span></div>' +
+    '<div class="stat"><b>' + withAny + ' of 51</b><span>States + DC with at least one</span></div>';
+}
+function renderTable(){
+  var d = DATA[mode];
+  document.getElementById("tableTitle").textContent = "All states — " + d.label.toLowerCase();
+  document.getElementById("thCount").textContent = mode === "mosque" ? "Mosques" : "Temples";
+  document.getElementById("tbody").innerHTML = rowsFor(mode).map(function(r){
+    return '<tr data-state="' + r.ab + '"><td>' + r.name + '</td><td class="num">' + r.count + '</td><td class="num">' + fmtRate(r.rate) + '</td><td class="num">#' + r.rank + '</td></tr>';
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll("tr[data-state]"), function(tr){
+    tr.addEventListener("click", function(){ selectState(tr.getAttribute("data-state"), true); });
+  });
+}
+function renderFeed(){
+  var d = DATA[mode];
+  document.getElementById("feedTitle").textContent = mode === "mosque" ? "New mosque openings" : "New temple openings";
+  document.getElementById("feed").innerHTML = d.feed.map(function(f){
+    return '<div class="feed-item"><span class="feed-date">' + f.date + '</span>' + (f.upcoming ? '<span class="badge">Upcoming</span>' : '') +
+      '<h3>' + f.name + '</h3><p>' + f.place + ' — ' + f.note + '</p></div>';
+  }).join("");
+  document.getElementById("leadersSub").textContent = d.label + " per 100,000 residents — top 5";
+  document.getElementById("leaders").innerHTML = rowsFor(mode).slice(0,5).map(function(r,i){
+    return '<div class="feed-item"><span class="feed-date">#' + (i+1) + ' · ' + fmtRate(r.rate) + ' per 100k</span><h3>' + r.name + '</h3><p>' + r.count + ' ' + d.singular + (r.count===1?"":"s") + ' · population ' + fmtPop(POP[r.ab]) + '</p></div>';
+  }).join("");
+}
+function renderDetail(){
+  var el = document.getElementById("detail");
+  var d = DATA[mode];
+  if(!selected){
+    el.innerHTML = '<div class="note">👆 <strong>Select a state</strong> on the map or in the table below to see its total, per-capita rate, and national rank.</div>';
+    return;
+  }
+  var r = rowsFor(mode).filter(function(x){return x.ab===selected;})[0];
+  el.innerHTML =
+    '<h2 style="margin-top:6px">' + r.name + '</h2>' +
+    '<div class="detail-grid">' +
+      '<div class="dbox"><b>' + r.count + '</b><span>' + d.label + ' in state</span></div>' +
+      '<div class="dbox"><b>' + fmtRate(r.rate) + '</b><span>Per 100,000 residents</span></div>' +
+      '<div class="dbox"><b>#' + r.rank + ' of 51</b><span>National per-capita rank</span></div>' +
+    '</div>' +
+    '<p class="sub">State population (2024 Census estimate): ' + fmtPop(POP[r.ab]) + '. Source: ' + d.sourceName + '.</p>' +
+    '<div class="note"><strong>Names &amp; cities for ' + r.name + ':</strong> the verified name-and-city directory for this state is still being imported, so no partial list is shown here yet. Browse the source directory directly: <a href="' + d.sourceUrl + '" target="_blank" rel="noopener">' + d.sourceLinkLabel + '</a>.</div>';
+}
+function selectState(ab, scroll){
+  selected = ab;
+  paintTiles();
+  renderDetail();
+  if(scroll){ document.getElementById("detail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
+}
+function setMode(m){
+  mode = m;
+  document.getElementById("btn-mosque").classList.toggle("active", m==="mosque");
+  document.getElementById("btn-temple").classList.toggle("active", m==="temple");
+  document.getElementById("btn-mosque").setAttribute("aria-selected", m==="mosque" ? "true" : "false");
+  document.getElementById("btn-temple").setAttribute("aria-selected", m==="temple" ? "true" : "false");
+  document.documentElement.style.setProperty("--accent", m==="mosque" ? "#0f766e" : "#b45309");
+  var d = DATA[m];
+  document.getElementById("mapTitle").textContent = d.label + " per 100,000 residents";
+  document.getElementById("mapSub").textContent = "Darker = more " + d.singular + "s per capita. National total: " + d.total.toLocaleString("en-US") + " (" + d.totalNote + "). Click a state for detail.";
+  renderStats(); renderTable(); renderFeed(); renderDetail(); paintTiles();
+}
+document.getElementById("btn-mosque").addEventListener("click", function(){ setMode("mosque"); });
+document.getElementById("btn-temple").addEventListener("click", function(){ setMode("temple"); });
+
+buildTiles();
+setMode("mosque");
+</script>
+</body>
+</html>
