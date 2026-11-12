@@ -35,7 +35,16 @@
   .stat b{display:block;font-size:1.25rem;line-height:1}
   .stat span{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:5px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
-  @media (max-width:960px){ .layout{grid-template-columns:1fr} }
+  @media (max-width:960px){
+    .layout{display:flex;flex-direction:column;gap:20px}
+    .layout>div,.layout>aside{display:contents}
+    .layout .card{margin-top:0 !important}
+    .card-map{order:1}
+    .card-feed{order:2}
+    .card-leaders{order:3}
+    .card-rankings{order:4}
+    .card-about{order:5}
+  }
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px}
   .card h2{font-size:1.15rem;margin:0 0 4px}
   .card .sub{font-family:system-ui,sans-serif;font-size:.85rem;color:var(--muted);margin:0 0 12px;line-height:1.5}
@@ -90,7 +99,7 @@
 
   <div class="layout">
     <div>
-      <section class="card" aria-label="United States map">
+      <section class="card card-map" aria-label="United States map">
         <h2 id="mapTitle">Mosques per 100,000 residents</h2>
         <p class="sub" id="mapSub">Darker = more mosques per capita.</p>
         <div id="tileMap" role="group" aria-label="Tile map of the United States. Each state is an equal-size tile so small states stay readable; shading shows the per-capita rate."></div>
@@ -99,7 +108,7 @@
         <div id="detail"></div>
       </section>
 
-      <section class="card" style="margin-top:20px" aria-label="State rankings">
+      <section class="card card-rankings" style="margin-top:20px" aria-label="State rankings">
         <h2 id="tableTitle">All states — mosques</h2>
         <p class="sub">Sorted by per-capita rate. Click a row to see that state's detail above.</p>
         <table>
@@ -109,7 +118,7 @@
         <p class="sub" style="margin-top:12px">* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state's source note.</p>
       </section>
 
-      <section class="card" style="margin-top:20px" aria-label="Methodology and sources">
+      <section class="card card-about" style="margin-top:20px" aria-label="Methodology and sources">
         <h2>About these numbers — please read</h2>
         <div class="method">
           <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques or Hindu temples in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. <strong>Counts are now aggregated from the best sources for each state</strong>, deduplicated by name and city where possible, rather than taken from one single source for every state. That makes the low-count states in particular more accurate — several single-source zeros were wrong — but it also means <strong>cross-state comparison is less exact</strong>, because different states may lean on different sources. Click any state to see the individual sources behind that state's number.</p>
@@ -123,12 +132,12 @@
     </div>
 
     <aside>
-      <section class="card" aria-label="Recent openings feed">
+      <section class="card card-feed" aria-label="Recent openings feed">
         <h2 id="feedTitle">New mosque openings</h2>
         <p class="sub">Verified openings and inaugurations. This is a curated list, not a complete national log.</p>
         <div id="feed"></div>
       </section>
-      <section class="card" style="margin-top:20px" aria-label="Per capita leaders">
+      <section class="card card-leaders" style="margin-top:20px" aria-label="Per capita leaders">
         <h2>Highest per capita</h2>
         <p class="sub" id="leadersSub">Mosques per 100,000 residents — top 5</p>
         <div id="leaders"></div>
