@@ -78,7 +78,7 @@
   <header class="top">
     <p class="kicker">BannedBible.com / RiseMap</p>
     <h1><span class="rise">Rise</span>Map</h1>
-    <p class="lede">Where Muslim and Hindu communities are growing across the United States. States are shaded by places of worship <strong>per 100,000 residents</strong> — so smaller states with strong communities stand out, not just the biggest states. Click any state for its numbers.</p>
+    <p class="lede">Where Muslim and Hindu communities are growing across the United States. States are shaded by places of worship <strong>per 100,000 residents</strong> — so smaller states with strong communities stand out, not just the biggest states. Click any state for its numbers. This page is updated weekly.</p>
     <div class="toggle-row">
       <div class="toggle" role="tablist" aria-label="Choose view">
         <button id="btn-mosque" class="active" role="tab" aria-selected="true">🕌 &nbsp;Mosques</button>
@@ -106,14 +106,16 @@
           <thead><tr><th>State</th><th class="num" id="thCount">Mosques</th><th class="num">Per 100k</th><th class="num">Rank</th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
+        <p class="sub" style="margin-top:12px">* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state's source note.</p>
       </section>
 
       <section class="card" style="margin-top:20px" aria-label="Methodology and sources">
         <h2>About these numbers — please read</h2>
         <div class="method">
-          <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques or Hindu temples in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. RiseMap does not merge sources into one “true” total; each view uses one source consistently so states can be compared fairly.</p>
-          <p><strong>Mosque view:</strong> HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em> dataset, IRS 501(c)(3) snapshot, <strong>July 2024</strong> — <strong>2,058</strong> mosques nationally. Because it is built from IRS nonprofit records, informal or unregistered prayer spaces are not counted.</p>
-          <p><strong>Hindu temple view:</strong> <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> directory — <strong>534</strong> temples nationally (530 across the 50 states + DC; the remainder are in U.S. territories, which are not shown on this map).</p>
+          <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques or Hindu temples in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. <strong>Counts are now aggregated from the best sources for each state</strong>, deduplicated by name and city where possible, rather than taken from one single source for every state. That makes the low-count states in particular more accurate — several single-source zeros were wrong — but it also means <strong>cross-state comparison is less exact</strong>, because different states may lean on different sources. Click any state to see the individual sources behind that state's number.</p>
+          <p><strong>Mosque view:</strong> aggregated total <strong>2,079</strong> mosques nationally. Sources used per state include HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em>, IRS 501(c)(3) snapshot, <strong>July 2024</strong>; the ISPU 2020 U.S. Mosque Survey; ASARB / the 2020 U.S. Religion Census; POI directory data (2025); and mosquesusa.com. HIFLD alone is built from IRS nonprofit records, so informal or unregistered prayer spaces — and places that never filed separately — are missed by that source, which is why the other sources are now combined for the states that were rechecked.</p>
+          <p><strong>Hindu temple view:</strong> aggregated total <strong>573</strong> temples nationally (569 across the 50 states + DC; the remainder are in U.S. territories, which are not shown on this map). Sources used per state include the <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> directory, the HUA directory, the 2020 U.S. Religion Census, and individually named temples and congregations found in the recheck of low-count states.</p>
+          <p><strong>* = uncertain</strong> — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state's source note. Click a corrected state and its panel lists each source's count for that state and explains the asterisk where one appears.</p>
           <p><strong>Per-capita rates</strong> use 2024 U.S. Census Bureau state population estimates: rate = count ÷ population × 100,000. Population is a state's total population, not its Muslim or Hindu population, so the rate shows how present these houses of worship are in the wider community.</p>
           <p><strong>Names &amp; cities:</strong> the full name-and-city directory for each state is still being imported and verified, so this page shows verified state totals only rather than an incomplete list. You can browse the underlying directories at <a href="https://hifld-geoplatform.hub.arcgis.com/" target="_blank" rel="noopener">HIFLD GeoPlatform</a> (mosques) and <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> (temples).</p>
         </div>
@@ -148,11 +150,25 @@ var POS = {AK:[0,0],ME:[11,0],WA:[1,1],MT:[2,1],ND:[3,1],MN:[4,1],WI:[5,1],MI:[7
 
 var DATA = {
   mosque: {
-    label:"Mosques", singular:"mosque", total:2058, totalNote:"HIFLD, July 2024",
-    counts:{AL:16,AK:1,AZ:31,AR:8,CA:272,CO:24,CT:37,DE:6,DC:5,FL:95,GA:59,HI:0,ID:6,IL:106,IN:33,IA:15,KS:13,KY:18,LA:16,ME:6,MD:55,MA:45,MI:83,MN:53,MS:6,MO:32,MT:1,NE:5,NV:8,NH:4,NJ:103,NM:6,NY:310,NC:51,ND:2,OH:78,OK:12,OR:18,PA:82,RI:6,SC:17,SD:4,TN:23,TX:151,UT:12,VT:2,VA:64,WA:34,WV:6,WI:17,WY:1},
+    label:"Mosques", singular:"mosque", total:2079, totalNote:"aggregated from the best sources per state — see methodology",
+    counts:{AL:16,AK:2,AZ:31,AR:8,CA:272,CO:24,CT:37,DE:6,DC:8,FL:95,GA:59,HI:4,ID:6,IL:106,IN:33,IA:15,KS:13,KY:18,LA:16,ME:6,MD:55,MA:45,MI:83,MN:53,MS:6,MO:32,MT:3,NE:10,NV:8,NH:5,NJ:103,NM:6,NY:310,NC:51,ND:3,OH:78,OK:12,OR:18,PA:82,RI:6,SC:17,SD:5,TN:23,TX:151,UT:12,VT:2,VA:64,WA:34,WV:6,WI:17,WY:4},
+    uncertain:{AK:true,MT:true,ND:true,NH:true,DC:true,NE:true},
+    rateOverrides:{HI:0.28,AK:0.27,WY:0.68,ND:0.38,VT:0.31,SD:0.54,DC:1.14},
+    sourceNotes:{
+      HI:"Sources for Hawaii: HIFLD 0 · ISPU 2020: 3 · POI 2025: 4. Aggregated count: 4.",
+      AK:"Sources for Alaska: HIFLD 1 · ISPU 2020: 2 · ASARB 2020: 2 · POI: 5. Aggregated count: 2*. * Possible 3rd mosque, unverified.",
+      MT:"Sources for Montana: HIFLD 1 · ISPU: 3 · POI: 3. Aggregated count: 3*. * Possible 4th; Butte status unclear.",
+      WY:"Sources for Wyoming: HIFLD 1 · ISPU: 3 · mosquesusa.com: 4. Aggregated count: 4.",
+      ND:"Sources for North Dakota: HIFLD 2 · ISPU: 6 · POI: 8. Aggregated count: 3*. * Verified floor — directories signal 6–8, but the additional names are not verified.",
+      VT:"Sources for Vermont: HIFLD 2 · ISPU: 4 (outlier, no names found) · POI: 2. Aggregated count: 2.",
+      NH:"Sources for New Hampshire: HIFLD 4 · ISPU: 7 · POI: 7. Aggregated count: 5*. * Verified floor — directories suggest 7.",
+      SD:"Sources for South Dakota: HIFLD 4 · ISPU: 5 · POI: 5. Aggregated count: 5.",
+      DC:"Sources for District of Columbia: HIFLD 5 · ISPU: 10 · POI: 8. Aggregated count: 8*. * Verified floor — ISPU suggests 10.",
+      NE:"Sources for Nebraska: HIFLD 5 · ISPU: 11 · POI: 19. Aggregated count: 10*. * An 11th is probable; Kearney is single-source."
+    },
     colors:["#e6f2ef","#bfe0d8","#8ec7ba","#57a893","#2f8a6e","#0f766e","#0a4f49"],
     darkTextUntil:2,
-    sourceName:"HIFLD All Places of Worship (IRS 501(c)(3) snapshot, July 2024)",
+    sourceName:"Aggregated — HIFLD, ISPU 2020, ASARB / 2020 Religion Census, POI 2025, and mosquesusa.com (per state; see source note)",
     sourceUrl:"https://hifld-geoplatform.hub.arcgis.com/",
     sourceLinkLabel:"HIFLD GeoPlatform",
     feed:[
@@ -162,11 +178,44 @@ var DATA = {
     ]
   },
   temple: {
-    label:"Hindu Temples", singular:"temple", total:534, totalNote:"HinduTemples.net; 530 in the 50 states + DC, remainder in territories",
-    counts:{AL:4,AK:1,AZ:10,AR:2,CA:61,CO:4,CT:12,DE:3,DC:0,FL:27,GA:16,HI:3,ID:4,IL:31,IN:8,IA:2,KS:4,KY:4,LA:1,ME:1,MD:12,MA:34,MI:13,MN:4,MS:0,MO:6,MT:0,NE:1,NV:1,NH:1,NJ:39,NM:2,NY:45,NC:8,ND:0,OH:29,OK:2,OR:6,PA:19,RI:2,SC:6,SD:1,TN:3,TX:64,UT:2,VT:0,VA:12,WA:10,WV:3,WI:7,WY:0},
+    label:"Hindu Temples", singular:"temple", total:573, totalNote:"aggregated from the best sources per state; 569 in the 50 states + DC, remainder in territories",
+    counts:{AL:7,AK:1,AZ:10,AR:5,CA:61,CO:6,CT:12,DE:3,DC:1,FL:27,GA:16,HI:3,ID:3,IL:31,IN:8,IA:4,KS:4,KY:5,LA:6,ME:1,MD:12,MA:34,MI:13,MN:8,MS:5,MO:6,MT:0,NE:1,NV:3,NH:1,NJ:39,NM:2,NY:45,NC:8,ND:0,OH:29,OK:5,OR:6,PA:19,RI:2,SC:6,SD:1,TN:9,TX:64,UT:4,VT:1,VA:12,WA:10,WV:3,WI:7,WY:0},
+    uncertain:{DC:true,VT:true,IA:true,RI:true,TN:true,AL:true,KS:true},
+    rateOverrides:{DC:0.14,MS:0.17,MT:0.00,ND:0.00,VT:0.15,WY:0.00,AK:0.14,LA:0.13,ME:0.07,NE:0.05,NV:0.09,NH:0.07,SD:0.11,AR:0.16,IA:0.12,NM:0.09,OK:0.12,RI:0.18,UT:0.11,DE:0.29,HI:0.21,WV:0.17,AL:0.14,CO:0.10,KY:0.11,MN:0.14},
+    sourceNotes:{
+      DC:"Sources for District of Columbia: HinduTemples.net 0 · Religion Census 0 · Individually named: 1. Aggregated count: 1*. * A community centre; 0 purpose-built temples.",
+      MS:"Sources for Mississippi: HinduTemples.net 0 · HUA 0 · Religion Census 2020 3. Aggregated count: 5 — the five named temples verified in the November 2026 recheck: Sita Ram Hindu Temple (Jackson), BAPS (Jackson), Hindu Temple Society of Mississippi (Brandon), Swaminarayan Hindu Temple (Pearl), New Talavana ISKCON (Carriere).",
+      MT:"Sources for Montana: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck.",
+      ND:"Sources for North Dakota: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck.",
+      VT:"Sources for Vermont: HinduTemples.net 0 · Religion Census 0 · Individually named: 1. Aggregated count: 1*. * A congregation; 0 purpose-built temples yet.",
+      WY:"Sources for Wyoming: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck.",
+      AK:"Sources for Alaska: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
+      LA:"Sources for Louisiana: HinduTemples.net 1 · Religion Census 5. Aggregated count: 6.",
+      ME:"Sources for Maine: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
+      NE:"Sources for Nebraska: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
+      NV:"Sources for Nevada: HinduTemples.net 1 · Religion Census 2020 1 · Plus 1 temple identified by name in the November 2026 recheck. Aggregated count: 3.",
+      NH:"Sources for New Hampshire: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
+      SD:"Sources for South Dakota: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
+      AR:"Sources for Arkansas: HinduTemples.net 2 · Religion Census 2020 1 · Plus 2 temples identified by name in the November 2026 recheck. Aggregated count: 5.",
+      IA:"Sources for Iowa: HinduTemples.net 2 · Religion Census 4. Aggregated count: 4*. * The 4th is Census-only and unnamed.",
+      NM:"Sources for New Mexico: HinduTemples.net 2. Aggregated count: 2 — confirmed as previously published.",
+      OK:"Sources for Oklahoma: HinduTemples.net 2 · Religion Census 3. Aggregated count: 5.",
+      RI:"Sources for Rhode Island: HinduTemples.net 2 · Religion Census 0. Aggregated count: 2*. * A possible 3rd in Barrington is unverified.",
+      UT:"Sources for Utah: HinduTemples.net 2 · Religion Census 2020 1 · Plus 1 temple identified by name in the November 2026 recheck. Aggregated count: 4.",
+      DE:"Sources for Delaware: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published.",
+      HI:"Sources for Hawaii: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published.",
+      TN:"Sources for Tennessee: HinduTemples.net 3 · HUA 0 · Religion Census 9. Aggregated count: 9*. * A floor — Memphis was not checked.",
+      WV:"Sources for West Virginia: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published.",
+      AL:"Sources for Alabama: HinduTemples.net 4 · Religion Census 7. Aggregated count: 7*. * The 6th and 7th are Census-only and unnamed.",
+      CO:"Sources for Colorado: HinduTemples.net 4 · Religion Census 2. Aggregated count: 6.",
+      ID:"Sources for Idaho: HinduTemples.net 4 (includes a double-listing of one temple) · HUA 0 · Religion Census 0. Aggregated, deduplicated count: 3.",
+      KS:"Sources for Kansas: HinduTemples.net 4 · Religion Census 4. Aggregated count: 4*. * The 4th is unnamed.",
+      KY:"Sources for Kentucky: HinduTemples.net 4 · Religion Census 4. Aggregated count: 5.",
+      MN:"Sources for Minnesota: HinduTemples.net 4 · Religion Census 5. Aggregated count: 8."
+    },
     colors:["#fdf0e2","#fbd9ae","#f6ba74","#ef9640","#e06f1a","#b45309","#7c2d12"],
     darkTextUntil:3,
-    sourceName:"HinduTemples.net directory",
+    sourceName:"Aggregated — HinduTemples.net, HUA directory, 2020 Religion Census, and individually named temples (per state; see source note)",
     sourceUrl:"https://hindutemples.net/",
     sourceLinkLabel:"HinduTemples.net",
     feed:[
@@ -185,13 +234,16 @@ function rowsFor(m){
   var d = DATA[m];
   var rows = Object.keys(d.counts).map(function(ab){
     var c = d.counts[ab];
-    return {ab:ab, name:NAMES[ab], count:c, rate: POP[ab] ? c / POP[ab] * 100000 : 0};
+    var computed = POP[ab] ? c / POP[ab] * 100000 : 0;
+    var rate = (d.rateOverrides && typeof d.rateOverrides[ab] === "number") ? d.rateOverrides[ab] : computed;
+    return {ab:ab, name:NAMES[ab], count:c, rate:rate, uncertain: !!(d.uncertain && d.uncertain[ab]), corrected: !!(d.sourceNotes && d.sourceNotes[ab])};
   });
   rows.sort(function(a,b){ return b.rate - a.rate || b.count - a.count; });
   rows.forEach(function(r,i){ r.rank = i+1; });
   return rows;
 }
 function fmtRate(r){ return r.toFixed(2); }
+function dispCount(r){ return r.count + (r.uncertain ? "*" : ""); }
 function fmtPop(n){ return n.toLocaleString("en-US"); }
 function maxRate(){ var rows = rowsFor(mode); return rows.length ? rows[0].rate : 1; }
 function bucketFor(rate){
@@ -225,14 +277,15 @@ function paintTiles(){
   Array.prototype.forEach.call(document.querySelectorAll(".tile"), function(t){
     var ab = t.getAttribute("data-ab");
     var c = d.counts[ab] || 0;
-    var rate = POP[ab] ? c / POP[ab] * 100000 : 0;
+    var unc = !!(d.uncertain && d.uncertain[ab]);
+    var rate = (d.rateOverrides && typeof d.rateOverrides[ab] === "number") ? d.rateOverrides[ab] : (POP[ab] ? c / POP[ab] * 100000 : 0);
     var bk = bucketFor(rate);
     t.style.background = bk < 0 ? zeroFill : d.colors[bk];
     t.style.color = (bk < 0 || bk <= d.darkTextUntil) ? "#1c1a17" : "#ffffff";
-    t.querySelector(".ct").textContent = c;
+    t.querySelector(".ct").textContent = c + (unc ? "*" : "");
     t.classList.toggle("selected", ab === selected);
-    t.setAttribute("aria-label", NAMES[ab] + ": " + c + " " + d.singular + (c===1?"":"s") + ", " + fmtRate(rate) + " per 100,000 residents");
-    t.title = NAMES[ab] + " — " + c + " " + d.singular + (c===1?"":"s") + " · " + fmtRate(rate) + " per 100k";
+    t.setAttribute("aria-label", NAMES[ab] + ": " + c + (unc ? ", uncertain — see source note, " : "") + " " + d.singular + (c===1?"":"s") + ", " + fmtRate(rate) + " per 100,000 residents");
+    t.title = NAMES[ab] + " — " + c + (unc ? "*" : "") + " " + d.singular + (c===1?"":"s") + " · " + fmtRate(rate) + " per 100k";
   });
   document.getElementById("legendBar").style.background = "linear-gradient(90deg," + d.colors.join(",") + ")";
   document.getElementById("legendMax").textContent = "Max " + fmtRate(maxRate()) + " per 100k";
@@ -253,7 +306,7 @@ function renderTable(){
   document.getElementById("tableTitle").textContent = "All states — " + d.label.toLowerCase();
   document.getElementById("thCount").textContent = mode === "mosque" ? "Mosques" : "Temples";
   document.getElementById("tbody").innerHTML = rowsFor(mode).map(function(r){
-    return '<tr data-state="' + r.ab + '"><td>' + r.name + '</td><td class="num">' + r.count + '</td><td class="num">' + fmtRate(r.rate) + '</td><td class="num">#' + r.rank + '</td></tr>';
+    return '<tr data-state="' + r.ab + '"><td>' + r.name + '</td><td class="num">' + dispCount(r) + '</td><td class="num">' + fmtRate(r.rate) + '</td><td class="num">#' + r.rank + '</td></tr>';
   }).join("");
   Array.prototype.forEach.call(document.querySelectorAll("tr[data-state]"), function(tr){
     tr.addEventListener("click", function(){ selectState(tr.getAttribute("data-state"), true); });
@@ -268,7 +321,7 @@ function renderFeed(){
   }).join("");
   document.getElementById("leadersSub").textContent = d.label + " per 100,000 residents — top 5";
   document.getElementById("leaders").innerHTML = rowsFor(mode).slice(0,5).map(function(r,i){
-    return '<div class="feed-item"><span class="feed-date">#' + (i+1) + ' · ' + fmtRate(r.rate) + ' per 100k</span><h3>' + r.name + '</h3><p>' + r.count + ' ' + d.singular + (r.count===1?"":"s") + ' · population ' + fmtPop(POP[r.ab]) + '</p></div>';
+    return '<div class="feed-item"><span class="feed-date">#' + (i+1) + ' · ' + fmtRate(r.rate) + ' per 100k</span><h3>' + r.name + '</h3><p>' + dispCount(r) + ' ' + d.singular + (r.count===1?"":"s") + ' · population ' + fmtPop(POP[r.ab]) + '</p></div>';
   }).join("");
 }
 function renderDetail(){
@@ -279,14 +332,16 @@ function renderDetail(){
     return;
   }
   var r = rowsFor(mode).filter(function(x){return x.ab===selected;})[0];
+  var note = (d.sourceNotes && d.sourceNotes[r.ab]) ? d.sourceNotes[r.ab] : null;
   el.innerHTML =
     '<h2 style="margin-top:6px">' + r.name + '</h2>' +
     '<div class="detail-grid">' +
-      '<div class="dbox"><b>' + r.count + '</b><span>' + d.label + ' in state</span></div>' +
+      '<div class="dbox"><b>' + dispCount(r) + '</b><span>' + d.label + ' in state</span></div>' +
       '<div class="dbox"><b>' + fmtRate(r.rate) + '</b><span>Per 100,000 residents</span></div>' +
       '<div class="dbox"><b>#' + r.rank + ' of 51</b><span>National per-capita rank</span></div>' +
     '</div>' +
-    '<p class="sub">State population (2024 Census estimate): ' + fmtPop(POP[r.ab]) + '. Source: ' + d.sourceName + '.</p>' +
+    (note ? '<div class="note" style="margin-bottom:12px"><strong>Source note — ' + r.name + ':</strong> ' + note + (r.uncertain ? '<br><span>* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state\'s source note.</span>' : '') + '</div>' : '') +
+    '<p class="sub">State population (2024 Census estimate): ' + fmtPop(POP[r.ab]) + '. Source: ' + (note ? note : d.sourceName + '.') + '</p>' +
     '<div class="note"><strong>Names &amp; cities for ' + r.name + ':</strong> the verified name-and-city directory for this state is still being imported, so no partial list is shown here yet. Browse the source directory directly: <a href="' + d.sourceUrl + '" target="_blank" rel="noopener">' + d.sourceLinkLabel + '</a>.</div>';
 }
 function selectState(ab, scroll){
