@@ -76,6 +76,18 @@
   .method{font-size:.9rem;line-height:1.65;color:var(--muted)}
   .method strong{color:var(--ink)}
   footer{margin-top:22px;font-family:system-ui,sans-serif;font-size:.8rem;color:var(--muted);line-height:1.6}
+  footer .privacy-line{margin-top:10px}
+  dialog.about-dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:0;max-width:min(560px,calc(100vw - 32px));width:100%}
+  dialog.about-dialog::backdrop{background:rgba(0,0,0,.45)}
+  .dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px 0}
+  .dialog-head h2{font-size:1.25rem;margin:0;line-height:1.2}
+  .dialog-close{flex:none;background:none;border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:1.15rem;line-height:1;cursor:pointer;width:2.25rem;padding:0}
+  .dialog-close:hover{background:rgba(127,127,127,.12)}
+  .dialog-body{padding:12px 20px 20px;font-size:.95rem;line-height:1.65}
+  .dialog-body p{margin:0 0 10px}
+  .dialog-body ul{margin:0;padding-left:20px}
+  .dialog-body li{margin-bottom:8px}
+  .dialog-body li:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -138,8 +150,24 @@
 
   <footer>
     RiseMap is a reference tool to help people find established Muslim communities when relocating, travelling, or researching an area. Figures are a snapshot from the sources and dates named above — check the source directory before relying on a count for a specific place.
+    <p class="privacy-line"><a id="privacy-open" href="#privacy-dialog" aria-haspopup="dialog" aria-controls="privacy-dialog">Privacy</a></p>
   </footer>
 </div>
+
+<dialog id="privacy-dialog" class="about-dialog" aria-labelledby="privacy-title">
+  <div class="dialog-head">
+    <h2 id="privacy-title">Privacy Notice</h2>
+    <button id="privacy-close" class="dialog-close" type="button" aria-label="Close Privacy Notice">&times;</button>
+  </div>
+  <div class="dialog-body">
+    <p>Your privacy and safety are important to us. This is a static website that is designed with a strict zero-logging and minimal-data philosophy:</p>
+    <ul>
+      <li><strong>No Tracking or Cookies:</strong> We do not use tracking cookies, third-party analytics, behavioral profiling, or advertising scripts.</li>
+      <li><strong>No IP Logging:</strong> We do not collect, log, or store visitor IP addresses or browsing activity.</li>
+      <li><strong>Communications:</strong> If you choose to contact us via email, please note that standard email is not end-to-end encrypted by default. Exercise appropriate caution depending on your threat model and local legal environment.</li>
+    </ul>
+  </div>
+</dialog>
 
 <script>
 // ---------- Verified data (do not extend without a source) ----------
@@ -311,6 +339,31 @@ function init(){
 
 buildTiles();
 init();
+
+// ---------- Privacy dialog ----------
+(function(){
+  var dialog = document.getElementById("privacy-dialog");
+  var openLink = document.getElementById("privacy-open");
+  var closeBtn = document.getElementById("privacy-close");
+  if(!dialog || !openLink) return;
+  openLink.addEventListener("click", function(e){
+    e.preventDefault();
+    if(typeof dialog.showModal === "function"){ dialog.showModal(); }
+    else { dialog.setAttribute("open", ""); }
+  });
+  if(closeBtn){
+    closeBtn.addEventListener("click", function(){
+      if(typeof dialog.close === "function"){ dialog.close(); }
+      else { dialog.removeAttribute("open"); }
+    });
+  }
+  dialog.addEventListener("click", function(e){
+    if(e.target === dialog){
+      if(typeof dialog.close === "function"){ dialog.close(); }
+      else { dialog.removeAttribute("open"); }
+    }
+  });
+})();
 </script>
 </body>
 </html>
