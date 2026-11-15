@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="light dark" />
 <link rel="icon" href="data:," />
-<title>RiseMap — Mosques & Hindu Temples in the United States</title>
+<title>RiseMap — Mosques in the United States</title>
 <style>
   :root{
     --bg:#f7f5f1; --panel:#ffffff; --ink:#1c1a17; --muted:#6b6560; --line:#e3ddd3;
@@ -25,11 +25,7 @@
   h1{font-size:2.1rem;line-height:1.05;margin:0;font-weight:700;letter-spacing:-.01em}
   h1 .rise{color:var(--accent)}
   .lede{font-size:1.02rem;line-height:1.55;color:var(--muted);max-width:62ch;margin:10px 0 0}
-  .toggle-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:18px 0 4px}
-  .toggle{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
-  .toggle button{font-family:system-ui,sans-serif;font-size:.95rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:10px 22px;border-radius:999px;cursor:pointer;min-height:44px}
-  .toggle button.active{background:var(--accent);color:#fff}
-  .toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .stat-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:18px 0 4px}
   .stat-strip{display:flex;flex-wrap:wrap;gap:10px;font-family:system-ui,sans-serif}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:132px}
   .stat b{display:block;font-size:1.25rem;line-height:1}
@@ -87,12 +83,8 @@
   <header class="top">
     <p class="kicker">BannedBible.com / RiseMap</p>
     <h1><span class="rise">Rise</span>Map</h1>
-    <p class="lede">Where Muslim and Hindu communities are growing across the United States. States are shaded by places of worship <strong>per 100,000 residents</strong> — so smaller states with strong communities stand out, not just the biggest states. Click any state for its numbers. This page is updated weekly.</p>
-    <div class="toggle-row">
-      <div class="toggle" role="tablist" aria-label="Choose view">
-        <button id="btn-mosque" class="active" role="tab" aria-selected="true">🕌 &nbsp;Mosques</button>
-        <button id="btn-temple" role="tab" aria-selected="false">🛕 &nbsp;Hindu Temples</button>
-      </div>
+    <p class="lede">Where Muslim communities are growing across the United States. States are shaded by mosques <strong>per 100,000 residents</strong> — so smaller states with strong communities stand out, not just the biggest states. Click any state for its numbers. This page is updated weekly.</p>
+    <div class="stat-row">
       <div class="stat-strip" id="statStrip"></div>
     </div>
   </header>
@@ -115,18 +107,17 @@
           <thead><tr><th>State</th><th class="num" id="thCount">Mosques</th><th class="num">Per 100k</th><th class="num">Rank</th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
-        <p class="sub" style="margin-top:12px">* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state's source note.</p>
+        <p class="sub" style="margin-top:12px">* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built building; see the state's source note.</p>
       </section>
 
       <section class="card card-about" style="margin-top:20px" aria-label="Methodology and sources">
         <h2>About these numbers — please read</h2>
         <div class="method">
-          <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques or Hindu temples in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. <strong>Counts are now aggregated from the best sources for each state</strong>, deduplicated by name and city where possible, rather than taken from one single source for every state. That makes the low-count states in particular more accurate — several single-source zeros were wrong — but it also means <strong>cross-state comparison is less exact</strong>, because different states may lean on different sources. Click any state to see the individual sources behind that state's number.</p>
-          <p><strong>Mosque view:</strong> aggregated total <strong>2,079</strong> mosques nationally. Sources used per state include HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em>, IRS 501(c)(3) snapshot, <strong>July 2024</strong>; the ISPU 2020 U.S. Mosque Survey; ASARB / the 2020 U.S. Religion Census; POI directory data (2025); and mosquesusa.com. HIFLD alone is built from IRS nonprofit records, so informal or unregistered prayer spaces — and places that never filed separately — are missed by that source, which is why the other sources are now combined for the states that were rechecked.</p>
-          <p><strong>Hindu temple view:</strong> aggregated total <strong>744</strong> temples nationally (740 across the 50 states + DC; the remainder are in U.S. territories, which are not shown on this map). The temple counts now include verified satsang centers, ashrams, and Hindu community/cultural centers with regular worship, from a November 2026 recount that added 171 such places (national total 573 → 744; 740 across the 50 states + DC). Counts remain aggregated from the best sources for each state. Sources used per state include the <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> directory, the HUA directory, the 2020 U.S. Religion Census, and individually named temples and congregations found in the recheck of low-count states and the November 2026 recount. “Probable” in a state’s panel means existence as a congregation is directory-verified but the current weekly schedule was not individually re-confirmed.</p>
-          <p><strong>* = uncertain</strong> — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state's source note. Click a corrected state and its panel lists each source's count for that state and explains the asterisk where one appears.</p>
-          <p><strong>Per-capita rates</strong> use 2024 U.S. Census Bureau state population estimates: rate = count ÷ population × 100,000. Population is a state's total population, not its Muslim or Hindu population, so the rate shows how present these houses of worship are in the wider community.</p>
-          <p><strong>Names &amp; cities:</strong> the full name-and-city directory for each state is still being imported and verified, so this page shows verified state totals only rather than an incomplete list. You can browse the underlying directories at <a href="https://hifld-geoplatform.hub.arcgis.com/" target="_blank" rel="noopener">HIFLD GeoPlatform</a> (mosques) and <a href="https://hindutemples.net/" target="_blank" rel="noopener">HinduTemples.net</a> (temples).</p>
+          <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. <strong>Counts are now aggregated from the best sources for each state</strong>, deduplicated by name and city where possible, rather than taken from one single source for every state. That makes the low-count states in particular more accurate — several single-source zeros were wrong — but it also means <strong>cross-state comparison is less exact</strong>, because different states may lean on different sources. Click any state to see the individual sources behind that state's number.</p>
+          <p><strong>Mosques &amp; Islamic centers:</strong> <strong>mosques and Islamic centers are counted together as one category</strong> — a place counts whether it is called a mosque or an Islamic center, deduplicated by name and city. Aggregated total <strong>2,079</strong> nationally. Sources used per state include HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em>, IRS 501(c)(3) snapshot, <strong>July 2024</strong>; the ISPU 2020 U.S. Mosque Survey; ASARB / the 2020 U.S. Religion Census; POI directory data (2025); and mosquesusa.com. HIFLD alone is built from IRS nonprofit records, so informal or unregistered prayer spaces — and places that never filed separately — are missed by that source, which is why the other sources are now combined for the states that were rechecked.</p>
+          <p><strong>* = uncertain</strong> — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built building; see the state's source note. Click a corrected state and its panel lists each source's count for that state and explains the asterisk where one appears.</p>
+          <p><strong>Per-capita rates</strong> use 2024 U.S. Census Bureau state population estimates: rate = count ÷ population × 100,000. Population is a state's total population, not its Muslim population, so the rate shows how present mosques are in the wider community.</p>
+          <p><strong>Names &amp; cities:</strong> the full name-and-city directory for each state is still being imported and verified, so this page shows verified state totals only rather than an incomplete list. You can browse the underlying directory at <a href="https://hifld-geoplatform.hub.arcgis.com/" target="_blank" rel="noopener">HIFLD GeoPlatform</a>.</p>
         </div>
       </section>
     </div>
@@ -146,7 +137,7 @@
   </div>
 
   <footer>
-    RiseMap is a reference tool to help people find established Muslim and Hindu communities when relocating, travelling, or researching an area. Figures are a snapshot from the sources and dates named above — check the source directory before relying on a count for a specific place. By 'temple' we mean a Hindu place of worship — including mandirs, satsang centers, ashrams, and Hindu community or cultural centers with regular worship — not only purpose-built temple buildings.
+    RiseMap is a reference tool to help people find established Muslim communities when relocating, travelling, or researching an area. Figures are a snapshot from the sources and dates named above — check the source directory before relying on a count for a specific place.
   </footer>
 </div>
 
@@ -184,76 +175,6 @@ var DATA = {
       {date:"Nov 27, 2026", upcoming:true, name:"Masjid Dar Al-Tawheed", place:"Richardson, Texas", note:"Inauguration scheduled — listed as upcoming."},
       {date:"June 5–6, 2026", upcoming:false, name:"Imam Al-Hasanain Mosque", place:"Dearborn Heights, Michigan", note:"Grand opening held over two days."},
       {date:"Feb 7, 2026", upcoming:false, name:"Masjid Istiqlal Houston", place:"Houston, Texas", note:"Inaugurated February 7, 2026."}
-    ]
-  },
-  temple: {
-    label:"Hindu Temples", singular:"temple", total:744, totalNote:"aggregated from the best sources per state; 740 in the 50 states + DC, remainder in territories; includes satsang centers, ashrams, and Hindu community/cultural centers with regular worship — see methodology",
-    counts:{AL:8,AK:1,AZ:14,AR:7,CA:79,CO:8,CT:17,DE:3,DC:1,FL:43,GA:23,HI:4,ID:3,IL:41,IN:14,IA:8,KS:4,KY:7,LA:7,ME:1,MD:15,MA:41,MI:17,MN:10,MS:5,MO:8,MT:0,NE:2,NV:3,NH:2,NJ:48,NM:6,NY:54,NC:10,ND:1,OH:37,OK:5,OR:10,PA:24,RI:2,SC:7,SD:1,TN:11,TX:75,UT:5,VT:1,VA:18,WA:16,WV:3,WI:10,WY:0},
-    uncertain:{DC:true,VT:true,IA:true,RI:true,TN:true,AL:true,KS:true},
-    sourceNotes:{
-      DC:"Sources for District of Columbia: HinduTemples.net 0 · Religion Census 0 · Individually named: 1. Aggregated count: 1*. * A community centre; 0 purpose-built temples.",
-      MS:"Sources for Mississippi: HinduTemples.net 0 · HUA 0 · Religion Census 2020 3. Aggregated count: 5 — the five named temples verified in the November 2026 recheck: Sita Ram Hindu Temple (Jackson), BAPS (Jackson), Hindu Temple Society of Mississippi (Brandon), Swaminarayan Hindu Temple (Pearl), New Talavana ISKCON (Carriere).",
-      MT:"Sources for Montana: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck. No dedicated Hindu worship space is listed in any directory. The Hindu Society of Montana (Missoula) is an active community organization but operates no physical worship space; worship is in private homes and informal gatherings.",
-      ND:"Sources for North Dakota: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck. November 2026 broadened recount (+1) — added Hindu places of worship: Sathya Sai Group of Fargo, Fargo (weekly Saturdays, NDSU Crossroads Lutheran Campus Ministry). New aggregated count: 1.",
-      VT:"Sources for Vermont: HinduTemples.net 0 · Religion Census 0 · Individually named: 1. Aggregated count: 1*. * A congregation; 0 purpose-built temples yet.",
-      WY:"Sources for Wyoming: HinduTemples.net 0 · Religion Census 0. Aggregated count: 0 — no temple found; this zero was verified in the recheck.",
-      AK:"Sources for Alaska: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
-      LA:"Sources for Louisiana: HinduTemples.net 1 · Religion Census 5. Aggregated count: 6. November 2026 broadened recount (+1) — added Hindu places of worship: Chinmaya Mission New Orleans, Kenner (probable). New aggregated count: 7.",
-      ME:"Sources for Maine: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
-      NE:"Sources for Nebraska: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published. November 2026 broadened recount (+1) — added Hindu places of worship: Sathya Sai Center of Lincoln–Omaha, Lincoln/Omaha (one entry serving both cities, counted once). New aggregated count: 2.",
-      NV:"Sources for Nevada: HinduTemples.net 1 · Religion Census 2020 1 · Plus 1 temple identified by name in the November 2026 recheck. Aggregated count: 3.",
-      NH:"Sources for New Hampshire: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published. November 2026 broadened recount (+1) — added Hindu places of worship: Saraswati Mandiram, Epping (ashram). New aggregated count: 2.",
-      SD:"Sources for South Dakota: HinduTemples.net 1. Aggregated count: 1 — confirmed as previously published.",
-      AR:"Sources for Arkansas: HinduTemples.net 2 · Religion Census 2020 1 · Plus 2 temples identified by name in the November 2026 recheck. Aggregated count: 5. November 2026 broadened recount (+2) — added Hindu places of worship: Chinmaya Mission Little Rock, Little Rock; Sri Sathya Sai Baba Center of Little Rock, Little Rock (probable). New aggregated count: 7.",
-      IA:"Sources for Iowa: HinduTemples.net 2 · Religion Census 4. Aggregated count: 4*. * The 4th is Census-only and unnamed. November 2026 broadened recount (+4) — added Hindu places of worship: Sathya Sai Center of Des Moines, Des Moines; Sathya Sai Center of Iowa City, Iowa City; Sathya Sai Center of Quad Cities, Quad Cities; Hindu Cultural and Educational Center, Des Moines (probable). New aggregated count: 8.",
-      NM:"Sources for New Mexico: HinduTemples.net 2. Aggregated count: 2 — confirmed as previously published. November 2026 broadened recount (+4) — added Hindu places of worship: Amma Center of New Mexico, Santa Fe; Sathya Sai Center of Albuquerque, Albuquerque (probable); Sathya Sai Center of Santa Fe, Santa Fe (probable); Sanatana Dharma Satsang / Gayatri Temple, Albuquerque (probable). New aggregated count: 6.",
-      OK:"Sources for Oklahoma: HinduTemples.net 2 · Religion Census 3. Aggregated count: 5.",
-      RI:"Sources for Rhode Island: HinduTemples.net 2 · Religion Census 0. Aggregated count: 2*. * A possible 3rd in Barrington is unverified.",
-      UT:"Sources for Utah: HinduTemples.net 2 · Religion Census 2020 1 · Plus 1 temple identified by name in the November 2026 recheck. Aggregated count: 4. November 2026 broadened recount (+1) — added Hindu places of worship: Sathya Sai Center of Salt Lake City, Salt Lake City. New aggregated count: 5.",
-      DE:"Sources for Delaware: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published.",
-      HI:"Sources for Hawaii: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published. November 2026 broadened recount (+1) — added Hindu places of worship: Sathya Sai Baba Center of Lower Puna, Pahoa (probable). New aggregated count: 4.",
-      TN:"Sources for Tennessee: HinduTemples.net 3 · HUA 0 · Religion Census 9. Aggregated count: 9*. * A floor — Memphis was not checked. November 2026 broadened recount (+2) — added Hindu places of worship: Sri Sathya Sai Center Nashville, Nashville (probable); Sri Sathya Sai Center of Memphis, Memphis (probable). New aggregated count: 11.",
-      WV:"Sources for West Virginia: HinduTemples.net 3. Aggregated count: 3 — confirmed as previously published.",
-      AL:"Sources for Alabama: HinduTemples.net 4 · Religion Census 7. Aggregated count: 7*. * The 6th and 7th are Census-only and unnamed. November 2026 broadened recount (+1) — added Hindu places of worship: Sathya Sai Group of Birmingham, Birmingham (probable). New aggregated count: 8.",
-      CO:"Sources for Colorado: HinduTemples.net 4 · Religion Census 2. Aggregated count: 6. November 2026 broadened recount (+2) — added Hindu places of worship: Sathya Sai Center of Boulder, Boulder; Sathya Sai Center of Southeast Denver, Denver. New aggregated count: 8. Haidakhandi Universal Ashram, Crestone, was already counted in Colorado's temple count and was not added again.",
-      ID:"Sources for Idaho: HinduTemples.net 4 (includes a double-listing of one temple) · HUA 0 · Religion Census 0. Aggregated, deduplicated count: 3.",
-      KS:"Sources for Kansas: HinduTemples.net 4 · Religion Census 4. Aggregated count: 4*. * The 4th is unnamed.",
-      KY:"Sources for Kentucky: HinduTemples.net 4 · Religion Census 4. Aggregated count: 5. November 2026 broadened recount (+2) — added Hindu places of worship: Sathya Sai Center of Louisville, Louisville (probable); Sathya Sai Center of Lexington, Lexington (probable). New aggregated count: 7.",
-      MN:"Sources for Minnesota: HinduTemples.net 4 · Religion Census 5. Aggregated count: 8. November 2026 broadened recount (+2) — added Hindu places of worship: Sathya Sai Center of Minneapolis, Minneapolis; Sathya Sai Group of Rochester, Rochester (probable). New aggregated count: 10.",
-      MA:"Sources for Massachusetts: aggregated count before the November 2026 broadened recount: 34. November 2026 broadened recount (+7) — added Hindu places of worship: Sri Sathya Sai Center of Boston (Sai Unity Center), Lowell; Sathya Sai Center of Northborough, Northborough; Sathya Sai Center of Norwood, Norwood; Sathya Sai Center of Chelmsford, Chelmsford (probable); OM Hindu Community Center, Billerica; Chinmaya Mission Boston–Newton, Newton; Chinmaya Mission Boston–Westborough/Metrowest, Westborough (probable). New aggregated count: 41.",
-      CT:"Sources for Connecticut: aggregated count before the November 2026 broadened recount: 12. November 2026 broadened recount (+5) — added Hindu places of worship: Sri Sathya Sai Center of Greater Hartford, Glastonbury/Hartford; Sathya Sai Center of Norwalk, Norwalk; Shelton Sai Center, Shelton; Stamford Sai Sannidhi, Stamford (probable); Chinmaya Mission Fairfield-New Haven, Stamford (probable). New aggregated count: 17.",
-      NY:"Sources for New York: aggregated count before the November 2026 broadened recount: 45. November 2026 broadened recount (+9) — added Hindu places of worship: Sri Sathya Sai Center of Flushing, Flushing (probable); Sai Mandir USA, Plainview (probable — a separate place from the Flushing center); Sri Sathya Sai Center of Manhattan, Manhattan; Sathya Sai Center of Rochester, Rochester (probable); Sathya Sai Center of Syracuse, Liverpool; Scarsdale Sai Group, White Plains; Chinmaya Mission New York–Westchester, Dobbs Ferry; Chinmaya Mission New York–Downtown Chelsea, Manhattan; Shanti Mandir, Walden (ashram). New aggregated count: 54.",
-      NJ:"Sources for New Jersey: aggregated count before the November 2026 broadened recount: 39. November 2026 broadened recount (+9) — added Hindu places of worship: Sri Sathya Sai Center of Cherry Hill, Cherry Hill; Sathya Sai Center of Medford, Medford; Sathya Sai Center of Jersey City, Jersey City; Global Council Center of Bridgewater, Hillsborough; Sri Sathya Sai Center of Edison, Edison; East Brunswick Sai Center, Monroe Township; Sarva Dharma Service Center, Farmingdale; Chinmaya Mission New Jersey–Jersey City/Hoboken, Hoboken; Chinmaya Ramdoot, Branchburg (probable). New aggregated count: 48.",
-      PA:"Sources for Pennsylvania: aggregated count before the November 2026 broadened recount: 19. November 2026 broadened recount (+5) — added Hindu places of worship: Sathya Sai Center of Pittsburgh, Pittsburgh; Chinmaya Kedar (Kedar Ashram), Langhorne; Chinmaya Ramalaya, Harleysville (probable); Chinmaya Sudarshan, West Chester; Chinmaya Mission Pittsburgh–South Hills, McDonald. New aggregated count: 24.",
-      MD:"Sources for Maryland: aggregated count before the November 2026 broadened recount: 12. November 2026 broadened recount (+3) — added Hindu places of worship: Sri Sathya Sai South Bethesda Center, Bethesda; Sri Sathya Sai Center of Baltimore, Columbia; Chinmaya Mission WRC–Frederick Chapter, Ijamsville. New aggregated count: 15.",
-      VA:"Sources for Virginia: aggregated count before the November 2026 broadened recount: 12. November 2026 broadened recount (+6) — added Hindu places of worship: Sathya Sai Center of Falls Church, Falls Church; Sathya Sai Center of Loudoun, Brambleton (probable); Prince William County Sai Group, Prince William Co. (probable); Chinmaya Somnath, Chantilly; Satchidananda Ashram–Yogaville, Buckingham (ashram); Virginia Namadwaar, Ruther Glen. New aggregated count: 18.",
-      NC:"Sources for North Carolina: aggregated count before the November 2026 broadened recount: 8. November 2026 broadened recount (+2) — added Hindu places of worship: Sathya Sai Center of Greensboro, Greensboro (probable); Chinmaya Mission Raleigh-Durham, Cary. New aggregated count: 10.",
-      SC:"Sources for South Carolina: aggregated count before the November 2026 broadened recount: 6. November 2026 broadened recount (+1) — added Hindu places of worship: Thulasi Vinayagam (Sai Center), Anderson (probable). New aggregated count: 7.",
-      GA:"Sources for Georgia: aggregated count before the November 2026 broadened recount: 16. November 2026 broadened recount (+7) — added Hindu places of worship: Sri Sathya Sai Baba Center of Atlanta, Sandy Springs/Atlanta; Sri Sathya Sai Group of North Atlanta, Atlanta (probable); Sri Sathya Sai Center of Northeast Atlanta, Cumming (probable); Atlanta Center (Self-Realization Fellowship), Smyrna; Siddha Yoga Meditation Center of Atlanta, Atlanta/Brookhaven; Namadwaar Atlanta, Atlanta (probable); Just Love Forest Ashram, Poetry (probable, ashram). New aggregated count: 23.",
-      FL:"Sources for Florida: aggregated count before the November 2026 broadened recount: 27. November 2026 broadened recount (+16) — added Hindu places of worship: Sathya Sai Group Gainesville, Gainesville (probable); Orlando Sai Center, Orlando (probable); South Miami Sai Center, Doral (probable); Sathya Sai Center of Jacksonville, Jacksonville; Sai Center Clearwater, Clearwater; Sai Group Fort Myers, Fort Myers (probable); West Palm Beach Sai Center, West Palm Beach (probable); Sathya Sai Center of Fort Lauderdale, Fort Lauderdale (probable); Chinmaya Mission Orlando, Casselberry/Orlando; Chinmaya Prasad Ashram (Tampa Bay), Lutz (ashram); Chinmaya Mission Miami, Miami (probable); Siddha Yoga Meditation Center, Gainesville; Siddha Yoga Meditation Center, Coral Gables/Miami; Siddha Yoga Meditation Center, Sarasota; Tampa Bay Meditation Group (SRF), Tampa; Yoga Research Foundation Ashram, South Miami (probable, ashram). New aggregated count: 43.",
-      TX:"Sources for Texas: aggregated count before the November 2026 broadened recount: 64. November 2026 broadened recount (+11) — added Hindu places of worship: Sri Sathya Sai Baba Center of Dallas, Plano; Sri Sathya Sai Center of Austin, Austin; Sathya Sai Center of North Houston, Houston; Sri Sathya Sai Center of South Houston, Sugar Land; Sri Sathya Sai Center at Houston, Katy; Sri Sathya Sai Center of San Antonio, San Antonio; Chinmaya Mission San Antonio, San Antonio; Vedanta Center of Greater Austin, Austin; Sri Sathya Sai Global Council Center of Dallas, Frisco (probable); North Dallas Sathya Sai BalVikas, Frisco (probable); Vedanta Society of Greater Houston, Houston (probable). New aggregated count: 75.",
-      OH:"Sources for Ohio: aggregated count before the November 2026 broadened recount: 29. November 2026 broadened recount (+8) — added Hindu places of worship: Sathya Sai Center of Cincinnati–Dayton, Cincinnati/Dayton; Sathya Sai Center of Cleveland East, Cleveland; Sathya Sai Center of Cleveland West, Cleveland; Sathya Sai Center of Columbus, Columbus; Sathya Sai Group of Canton, Canton (probable); Sathya Sai Group of Toledo, Toledo (probable); Vedic Satsang, Solon; Om Center Divya Dham, Galion. New aggregated count: 37.",
-      MI:"Sources for Michigan: aggregated count before the November 2026 broadened recount: 13. November 2026 broadened recount (+4) — added Hindu places of worship: Sathya Sai Center of Ann Arbor, Ann Arbor; Sathya Sai Center of Detroit Metro, Farmington Hills; Chinmaya Mission Flint (Tapovanam ashram), Flint (probable — counted on the lean that the directory's single unnamed Flint entry is the Kasi temple); Ramakrishna Ashrama / Vedanta Study Circle, Warren. New aggregated count: 17.",
-      IN:"Sources for Indiana: aggregated count before the November 2026 broadened recount: 8. November 2026 broadened recount (+6) — added Hindu places of worship: Sathya Sai Center of Fort Wayne, Fort Wayne; Sathya Sai Group of Northwest Munster, Munster (probable); Sathya Sai Group of South Bend, South Bend (probable); Sathya Sai Group of West Lafayette, West Lafayette (probable); Chinmaya Mission Northwest Indiana (Omkara), Merrillville (probable); Sant Nirankari Oneness Center, Indianapolis (probable). New aggregated count: 14. Note: Sant Nirankari is a distinct movement with Hindu roots.",
-      IL:"Sources for Illinois: aggregated count before the November 2026 broadened recount: 31. November 2026 broadened recount (+10) — added Hindu places of worship: Sathya Sai Center of Bloomington, Bloomington; Sathya Sai Center of Champaign-Urbana, Champaign-Urbana; Sathya Sai Center of Chicago Metro, Chicago; Sathya Sai Center of Chicago North Suburbs, Chicago; Sathya Sai Center of Chicago Southeast, Chicago; Sathya Sai Center of Chicago West Suburbs, Chicago; Sathya Sai Group of Morton-Peoria, Morton/Peoria (probable); Sathya Sai Group of Quincy, Quincy (probable); Chinmaya Hamsavahini (Chinmaya Mission Peoria), Peoria (probable — counted on the lean that the directory's single unnamed West Peoria entry is the Hindu Temple of Central Illinois); Arya Samaj of Chicagoland, West Chicago (probable). New aggregated count: 41.",
-      WI:"Sources for Wisconsin: aggregated count before the November 2026 broadened recount: 7. November 2026 broadened recount (+3) — added Hindu places of worship: Sathya Sai Center of Milwaukee, Milwaukee; Sathya Sai Group of Madison, Madison (probable); Chinmaya Mission Milwaukee, Wauwatosa (probable). New aggregated count: 10.",
-      MO:"Sources for Missouri: aggregated count before the November 2026 broadened recount: 6. November 2026 broadened recount (+2) — added Hindu places of worship: Sathya Sai Center of Greater St. Louis, Bridgeton; Sathya Sai Center of Columbia, Columbia. New aggregated count: 8.",
-      AZ:"Sources for Arizona: aggregated count before the November 2026 broadened recount: 10. November 2026 broadened recount (+4) — added Hindu places of worship: Sri Sathya Sai Global Center of Mesa, Mesa; Sathya Sai Center of Phoenix, Phoenix (probable); Sathya Sai Center of Scottsdale, Scottsdale (probable); Chinmaya Mission Phoenix (Chinmaya Goloka), Mesa. New aggregated count: 14. The Arizona Vedic Cultural Center of Swaminarayan Gurukul, Apache Junction, was already counted in Arizona's temple count and was not added again.",
-      CA:"Sources for California: aggregated count before the November 2026 broadened recount: 61. November 2026 broadened recount (+18) — added Hindu places of worship: Chinmaya Mission Los Angeles, Tustin; Chinmaya Mission San Diego, Poway; Chinmaya Mission Sacramento, Sacramento; Chinmaya Mission San Jose (Sandeepany Ashram), San Jose (probable); Chinmaya Mission Bakersfield, Bakersfield (probable); Sri Sathya Sai Baba Center of Sacramento, Sacramento; Sathya Sai Baba Center of San Francisco, San Francisco; Los Angeles Sathya Sai Center, Los Angeles; Sri Sathya Sai Baba Center of Central San Jose, San Jose; North East San Diego (NESD) Sai Center, San Diego (probable); Tustin Sai Center, Tustin; SSSGC Center Oceanside, Oceanside (probable); Sri Sathya Sai Baba Center of Concord, Concord (probable); MA Center (Amma), San Ramon; Ananda Palo Alto, Palo Alto; Ananda Sacramento, Rancho Cordova; Sri Aurobindo Center of Los Angeles, Culver City (probable); SRF Sacramento Meditation Center, Sacramento (probable). New aggregated count: 79.",
-      OR:"Sources for Oregon: aggregated count before the November 2026 broadened recount: 6. November 2026 broadened recount (+4) — added Hindu places of worship: Sri Sathya Sai Center of Beaverton, Beaverton; Sri Sathya Sai Center of Grants Pass, Grants Pass (probable); Vedanta Society of Portland, Portland (probable); Ananda Portland, Portland. New aggregated count: 10.",
-      WA:"Sources for Washington: aggregated count before the November 2026 broadened recount: 10. November 2026 broadened recount (+6) — added Hindu places of worship: Chinmaya Mission Seattle (Chinmaya Dwaraka), Lynnwood; Vedanta Society of Western Washington, Seattle (probable); Sri Sathya Sai Seattle Eastside Center, Bellevue; Sammamish Sai Center, Sammamish; Sri Sathya Sai Center of Lake Washington, Mercer Island (probable); Ananda Seattle, Seattle. New aggregated count: 16."
-    },
-    colors:["#fdf0e2","#fbd9ae","#f6ba74","#ef9640","#e06f1a","#b45309","#7c2d12"],
-    darkTextUntil:3,
-    sourceName:"Aggregated — HinduTemples.net, HUA directory, 2020 Religion Census, and individually named temples (per state; see source note)",
-    sourceUrl:"https://hindutemples.net/",
-    sourceLinkLabel:"HinduTemples.net",
-    feed:[
-      {date:"Sep 2, 2026", upcoming:false, name:"ISKCON Cedar Park Temple", place:"Cedar Park, Texas", note:"Opened September 2, 2026."},
-      {date:"July 31–Aug 2, 2026", upcoming:false, name:"BAPS Shri Swaminarayan Mandir", place:"Birmingham, Alabama", note:"Consecrated July 31–August 2, 2026 — new mandir; 1,000+ devotees attended the three-day Murti Pratishtha Mahotsav."},
-      {date:"May 10, 2026", upcoming:false, name:"BAPS Shri Swaminarayan Mandir", place:"Huntsville, Alabama", note:"Opened May 10, 2026."},
-      {date:"May 2, 2026", upcoming:false, name:"Eastern Iowa Hindu Temple and Cultural Center", place:"Robins, Iowa", note:"Opened May 2, 2026."},
-      {date:"Sep 13, 2025", upcoming:false, name:"BAPS Mandir", place:"Kearns, Utah", note:"Opened September 13, 2025."}
     ]
   }
 };
@@ -328,14 +249,14 @@ function renderStats(){
   var top = rows[0];
   var withAny = rows.filter(function(r){return r.count>0;}).length;
   document.getElementById("statStrip").innerHTML =
-    '<div class="stat"><b>' + d.total.toLocaleString("en-US") + '</b><span>' + (mode==="mosque" ? "Mosques nationwide" : "Temples nationwide") + '</span></div>' +
+    '<div class="stat"><b>' + d.total.toLocaleString("en-US") + '</b><span>Mosques nationwide</span></div>' +
     '<div class="stat"><b>' + top.name + '</b><span>Highest per capita · ' + fmtRate(top.rate) + '/100k</span></div>' +
     '<div class="stat"><b>' + withAny + ' of 51</b><span>States + DC with at least one</span></div>';
 }
 function renderTable(){
   var d = DATA[mode];
   document.getElementById("tableTitle").textContent = "All states — " + d.label.toLowerCase();
-  document.getElementById("thCount").textContent = mode === "mosque" ? "Mosques" : "Temples";
+  document.getElementById("thCount").textContent = "Mosques";
   document.getElementById("tbody").innerHTML = rowsFor(mode).map(function(r){
     return '<tr data-state="' + r.ab + '"><td>' + r.name + '</td><td class="num">' + dispCount(r) + '</td><td class="num">' + fmtRate(r.rate) + '</td><td class="num">#' + r.rank + '</td></tr>';
   }).join("");
@@ -345,7 +266,7 @@ function renderTable(){
 }
 function renderFeed(){
   var d = DATA[mode];
-  document.getElementById("feedTitle").textContent = mode === "mosque" ? "New mosque openings" : "New temple openings";
+  document.getElementById("feedTitle").textContent = "New mosque openings";
   document.getElementById("feed").innerHTML = d.feed.map(function(f){
     return '<div class="feed-item"><span class="feed-date">' + f.date + '</span>' + (f.upcoming ? '<span class="badge">Upcoming</span>' : '') +
       '<h3>' + f.name + '</h3><p>' + f.place + ' — ' + f.note + '</p></div>';
@@ -371,7 +292,7 @@ function renderDetail(){
       '<div class="dbox"><b>' + fmtRate(r.rate) + '</b><span>Per 100,000 residents</span></div>' +
       '<div class="dbox"><b>#' + r.rank + ' of 51</b><span>National per-capita rank</span></div>' +
     '</div>' +
-    (note ? '<div class="note" style="margin-bottom:12px"><strong>Source note — ' + r.name + ':</strong> ' + note + (r.uncertain ? '<br><span>* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built temple; see the state\'s source note.</span>' : '') + '</div>' : '') +
+    (note ? '<div class="note" style="margin-bottom:12px"><strong>Source note — ' + r.name + ':</strong> ' + note + (r.uncertain ? '<br><span>* = uncertain — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built building; see the state\'s source note.</span>' : '') + '</div>' : '') +
     '<p class="sub">State population (2024 Census estimate): ' + fmtPop(POP[r.ab]) + '. Source: ' + (note ? note : d.sourceName + '.') + '</p>' +
     '<div class="note"><strong>Names &amp; cities for ' + r.name + ':</strong> the verified name-and-city directory for this state is still being imported, so no partial list is shown here yet. Browse the source directory directly: <a href="' + d.sourceUrl + '" target="_blank" rel="noopener">' + d.sourceLinkLabel + '</a>.</div>';
 }
@@ -381,23 +302,15 @@ function selectState(ab, scroll){
   renderDetail();
   if(scroll){ document.getElementById("detail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
 }
-function setMode(m){
-  mode = m;
-  document.getElementById("btn-mosque").classList.toggle("active", m==="mosque");
-  document.getElementById("btn-temple").classList.toggle("active", m==="temple");
-  document.getElementById("btn-mosque").setAttribute("aria-selected", m==="mosque" ? "true" : "false");
-  document.getElementById("btn-temple").setAttribute("aria-selected", m==="temple" ? "true" : "false");
-  document.documentElement.style.setProperty("--accent", m==="mosque" ? "#0f766e" : "#b45309");
-  var d = DATA[m];
+function init(){
+  var d = DATA[mode];
   document.getElementById("mapTitle").textContent = d.label + " per 100,000 residents";
   document.getElementById("mapSub").textContent = "Darker = more " + d.singular + "s per capita. National total: " + d.total.toLocaleString("en-US") + " (" + d.totalNote + "). Click a state for detail.";
   renderStats(); renderTable(); renderFeed(); renderDetail(); paintTiles();
 }
-document.getElementById("btn-mosque").addEventListener("click", function(){ setMode("mosque"); });
-document.getElementById("btn-temple").addEventListener("click", function(){ setMode("temple"); });
 
 buildTiles();
-setMode("mosque");
+init();
 </script>
 </body>
 </html>
