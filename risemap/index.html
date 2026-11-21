@@ -126,7 +126,7 @@
         <h2>About these numbers — please read</h2>
         <div class="method">
           <p><strong>Counts vary by source and method.</strong> There is no single official registry of mosques in the U.S., so totals differ depending on what a source counts — for example, only incorporated nonprofits, only purpose-built buildings, or also prayer spaces inside other buildings. <strong>Counts are now aggregated from the best sources for each state</strong>, deduplicated by name and city where possible, rather than taken from one single source for every state. That makes the low-count states in particular more accurate — several single-source zeros were wrong — but it also means <strong>cross-state comparison is less exact</strong>, because different states may lean on different sources. Click any state to see the individual sources behind that state's number.</p>
-          <p><strong>Mosques &amp; Islamic centers:</strong> <strong>mosques and Islamic centers are counted together as one category</strong> — a place counts whether it is called a mosque or an Islamic center, deduplicated by name and city. Aggregated total <strong>2,079</strong> nationally. Sources used per state include HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em>, IRS 501(c)(3) snapshot, <strong>July 2024</strong>; the ISPU 2020 U.S. Mosque Survey; ASARB / the 2020 U.S. Religion Census; POI directory data (2025); and mosquesusa.com. HIFLD alone is built from IRS nonprofit records, so informal or unregistered prayer spaces — and places that never filed separately — are missed by that source, which is why the other sources are now combined for the states that were rechecked.</p>
+          <p><strong>Mosques &amp; Islamic centers:</strong> <strong>mosques and Islamic centers are counted together as one category</strong> — a place counts whether it is called a mosque or an Islamic center, deduplicated by name and city. Aggregated total <strong>2,080</strong> nationally. Sources used per state include HIFLD (Homeland Infrastructure Foundation-Level Data) <em>All Places of Worship</em>, IRS 501(c)(3) snapshot, <strong>July 2024</strong>; the ISPU 2020 U.S. Mosque Survey; ASARB / the 2020 U.S. Religion Census; POI directory data (2025); and mosquesusa.com. HIFLD alone is built from IRS nonprofit records, so informal or unregistered prayer spaces — and places that never filed separately — are missed by that source, which is why the other sources are now combined for the states that were rechecked.</p>
           <p><strong>* = uncertain</strong> — a verified floor, an unnamed source-only count, a possible additional place, or a congregation without a purpose-built building; see the state's source note. Click a corrected state and its panel lists each source's count for that state and explains the asterisk where one appears.</p>
           <p><strong>Per-capita rates</strong> use 2024 U.S. Census Bureau state population estimates: rate = count ÷ population × 100,000. Population is a state's total population, not its Muslim population, so the rate shows how present mosques are in the wider community.</p>
           <p><strong>Names &amp; cities:</strong> the full name-and-city directory for each state is still being imported and verified, so this page shows verified state totals only rather than an incomplete list. You can browse the underlying directory at <a href="https://hifld-geoplatform.hub.arcgis.com/" target="_blank" rel="noopener">HIFLD GeoPlatform</a>.</p>
@@ -178,8 +178,8 @@ var POS = {AK:[0,0],ME:[11,0],WA:[1,1],MT:[2,1],ND:[3,1],MN:[4,1],WI:[5,1],MI:[7
 
 var DATA = {
   mosque: {
-    label:"Mosques", singular:"mosque", total:2079, totalNote:"aggregated from the best sources per state — see methodology",
-    counts:{AL:16,AK:2,AZ:31,AR:8,CA:272,CO:24,CT:37,DE:6,DC:8,FL:95,GA:59,HI:4,ID:6,IL:106,IN:33,IA:15,KS:13,KY:18,LA:16,ME:6,MD:55,MA:45,MI:83,MN:53,MS:6,MO:32,MT:3,NE:10,NV:8,NH:5,NJ:103,NM:6,NY:310,NC:51,ND:3,OH:78,OK:12,OR:18,PA:82,RI:6,SC:17,SD:5,TN:23,TX:151,UT:12,VT:2,VA:64,WA:34,WV:6,WI:17,WY:4},
+    label:"Mosques", singular:"mosque", total:2080, totalNote:"aggregated from the best sources per state — see methodology",
+    counts:{AL:16,AK:2,AZ:31,AR:8,CA:273,CO:24,CT:37,DE:6,DC:8,FL:95,GA:59,HI:4,ID:6,IL:106,IN:33,IA:15,KS:13,KY:18,LA:16,ME:6,MD:55,MA:45,MI:83,MN:53,MS:6,MO:32,MT:3,NE:10,NV:8,NH:5,NJ:103,NM:6,NY:310,NC:51,ND:3,OH:78,OK:12,OR:18,PA:82,RI:6,SC:17,SD:5,TN:23,TX:151,UT:12,VT:2,VA:64,WA:34,WV:6,WI:17,WY:4},
     uncertain:{AK:true,MT:true,ND:true,NH:true,DC:true,NE:true},
     rateOverrides:{HI:0.28,AK:0.27,WY:0.68,ND:0.38,VT:0.31,SD:0.54,DC:1.14},
     sourceNotes:{
@@ -192,7 +192,8 @@ var DATA = {
       NH:"Sources for New Hampshire: HIFLD 4 · ISPU: 7 · POI: 7. Aggregated count: 5*. * Verified floor — directories suggest 7.",
       SD:"Sources for South Dakota: HIFLD 4 · ISPU: 5 · POI: 5. Aggregated count: 5.",
       DC:"Sources for District of Columbia: HIFLD 5 · ISPU: 10 · POI: 8. Aggregated count: 8*. * Verified floor — ISPU suggests 10.",
-      NE:"Sources for Nebraska: HIFLD 5 · ISPU: 11 · POI: 19. Aggregated count: 10*. * An 11th is probable; Kearney is single-source."
+      NE:"Sources for Nebraska: HIFLD 5 · ISPU: 11 · POI: 19. Aggregated count: 10*. * An 11th is probable; Kearney is single-source.",
+      CA:"Aggregated count: 273 (was 272; +1 Cupertino Islamic Center, grand opening Nov 21, 2026 — West Valley Muslim Association, wvmuslim.org)."
     },
     colors:["#e6f2ef","#bfe0d8","#8ec7ba","#57a893","#2f8a6e","#0f766e","#0a4f49"],
     darkTextUntil:2,
@@ -201,6 +202,7 @@ var DATA = {
     sourceLinkLabel:"HIFLD GeoPlatform",
     feed:[
       {date:"Nov 27, 2026", upcoming:true, name:"Masjid Dar Al-Tawheed", place:"Richardson, Texas", note:"Inauguration scheduled — listed as upcoming."},
+      {date:"Nov 21, 2026", upcoming:false, name:"Cupertino Islamic Center", place:"Cupertino, California", note:"Grand opening Nov 21, 2026 — new masjid of the West Valley Muslim Association; five daily prayers begin at the new location."},
       {date:"June 5–6, 2026", upcoming:false, name:"Imam Al-Hasanain Mosque", place:"Dearborn Heights, Michigan", note:"Grand opening held over two days."},
       {date:"Feb 7, 2026", upcoming:false, name:"Masjid Istiqlal Houston", place:"Houston, Texas", note:"Inaugurated February 7, 2026."}
     ]
